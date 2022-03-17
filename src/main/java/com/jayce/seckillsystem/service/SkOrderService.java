@@ -1,7 +1,7 @@
 package com.jayce.seckillsystem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jayce.seckillsystem.domain.SkOrder;
+import com.jayce.seckillsystem.entity.SkOrder;
 
 /**
  * TODO

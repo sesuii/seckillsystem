@@ -12,5 +12,5 @@ public interface SeckillService {
      * @param userId  用户ID
      * @param goodsId 商品ID
      */
-    boolean seckill(Integer userId, Integer goodsId) throws Exception;
+    boolean seckill(Long userId, Long goodsId) throws Exception;
 }

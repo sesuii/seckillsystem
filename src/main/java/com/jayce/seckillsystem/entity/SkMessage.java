@@ -1,4 +1,4 @@
-package com.jayce.seckillsystem.domain;
+package com.jayce.seckillsystem.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SkMessage {
-    private Integer userId;
-
-    private Integer goodsId;
+    private Long userId;
+    private Long goodsId;
 }

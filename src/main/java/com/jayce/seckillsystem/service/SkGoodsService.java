@@ -1,7 +1,7 @@
 package com.jayce.seckillsystem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jayce.seckillsystem.domain.SkGoods;
+import com.jayce.seckillsystem.entity.SkGoods;
 
 /**
  * 商品管理
@@ -16,7 +16,7 @@ public interface SkGoodsService extends IService<SkGoods> {
      * @param goodsId 商品ID
      * @return 商品库存
      */
-    int getStock(Integer goodsId);
+    int getStock(Long goodsId);
 
     /**
      * 扣减商品库存

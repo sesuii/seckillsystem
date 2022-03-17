@@ -1,7 +1,7 @@
 package com.jayce.seckillsystem.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jayce.seckillsystem.domain.SkOrder;
+import com.jayce.seckillsystem.entity.SkOrder;
 
 /**
  * TODO

@@ -2,7 +2,7 @@ package com.jayce.seckillsystem.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jayce.seckillsystem.dao.SkGoodsMapper;
-import com.jayce.seckillsystem.domain.SkGoods;
+import com.jayce.seckillsystem.entity.SkGoods;
 import com.jayce.seckillsystem.service.SkGoodsService;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ public class SkGoodsServiceImpl extends ServiceImpl<SkGoodsMapper, SkGoods> impl
     private SkGoodsMapper skGoodsMapper;
 
     @Override
-    public int getStock(Integer goodsId) {
+    public int getStock(Long goodsId) {
         return skGoodsMapper.getStock(goodsId);
     }
 

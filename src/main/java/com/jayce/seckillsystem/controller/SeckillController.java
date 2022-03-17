@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.google.common.util.concurrent.RateLimiter;
 import com.jayce.seckillsystem.constant.RedisConstant;
-import com.jayce.seckillsystem.domain.GoodsStore;
-import com.jayce.seckillsystem.domain.SkGoods;
-import com.jayce.seckillsystem.domain.SkMessage;
-import com.jayce.seckillsystem.domain.SkUser;
+import com.jayce.seckillsystem.entity.GoodsStore;
+import com.jayce.seckillsystem.entity.SkGoods;
+import com.jayce.seckillsystem.entity.SkMessage;
+import com.jayce.seckillsystem.entity.SkUser;
 import com.jayce.seckillsystem.rabbitmq.SkMessageSender;
 import com.jayce.seckillsystem.service.SkGoodsService;
 import com.jayce.seckillsystem.util.RedisLock;
@@ -63,7 +63,7 @@ public class SeckillController {
     @PostConstruct
     public void goodsStockWarmUp() {
         List<SkGoods> skGoodsList = skGoodsService.list();
-        int goodsCount = skGoodsService.count();
+        long goodsCount = skGoodsService.count();
         GoodsStore.goodsSoldOut = new ConcurrentHashMap<>((int) (goodsCount / 0.75 + 1));
         skGoodsList.forEach(
                 skGoods -> {
@@ -79,7 +79,7 @@ public class SeckillController {
      * @return
      */
     @PostMapping("/goods")
-    public String seckillGoods(@RequestParam("goodsId") Integer goodsId) {
+    public String seckillGoods(@RequestParam("goodsId") Long goodsId) {
         // 判断用户是否登录
 //        SkUser skUser = isLogin();
 //        if (skUser == null) {
@@ -95,7 +95,7 @@ public class SeckillController {
 //        }
 
         // 使用随机字数字模拟 userId
-        int userId = new Random().nextInt(2000);
+        long userId = new Random().nextInt(2000);
 
         // 判断商品是否卖完了
         if (hasSoldOut(goodsId)) {
@@ -153,7 +153,7 @@ public class SeckillController {
      * @param goodsId 商品 id
      * @return 返回 true 表示该商品卖完了
      */
-    private boolean hasSoldOut(int goodsId) {
+    private boolean hasSoldOut(long goodsId) {
         Boolean soldOut = GoodsStore.goodsSoldOut.get(goodsId);
         return soldOut != null && soldOut;
     }
@@ -165,7 +165,7 @@ public class SeckillController {
      * @param goodsId 商品 id
      * @return 返回 true 表示当前用户已经购买过该商品
      */
-    private boolean hasPurchased(int userId, int goodsId) {
+    private boolean hasPurchased(long userId, long goodsId) {
         Boolean hasPurchased = redisTemplate.hasKey(RedisConstant.PURCHASED_USER_PREFIX + userId + goodsId);
         return hasPurchased != null && hasPurchased;
     }
@@ -176,7 +176,7 @@ public class SeckillController {
      * @param goodsId 商品 id
      * @return 返回 true 表示当前商品还有库存
      */
-    private boolean hasStock(Integer goodsId) {
+    private boolean hasStock(Long goodsId) {
         // redis + lua 扣减库存
         Long stock = redisTemplate.execute(redisScript, Collections.singletonList(RedisConstant.GOODS_PREFIX + goodsId));
         return stock != null && stock >= 0;

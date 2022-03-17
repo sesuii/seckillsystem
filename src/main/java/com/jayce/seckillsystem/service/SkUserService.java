@@ -1,7 +1,7 @@
 package com.jayce.seckillsystem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jayce.seckillsystem.domain.SkUser;
+import com.jayce.seckillsystem.entity.SkUser;
 
 /**
  * SkUserService
@@ -12,9 +12,10 @@ public interface SkUserService extends IService<SkUser> {
     /**
      * 登录方法
      *
-     * @param username 用户名
+     * @param mobilePhone 手机号码
      * @param password 密码
      */
-    boolean login(String username, String password);
+    boolean login(String mobilePhone, String password);
 
+    void createAccount();
 }

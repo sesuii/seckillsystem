@@ -1,4 +1,4 @@
-package com.jayce.seckillsystem.domain;
+package com.jayce.seckillsystem.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * 秒杀商品
+ * 秒杀订单
  *
  * @author <a href="mailto: su_1999@126.com">sujian</a>
  */
@@ -20,38 +20,32 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sk_goods")
-public class SkGoods implements Serializable {
+@TableName(value = "sk_order")
+public class SkOrder implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     /**
-     * 商品名称
+     * 订单ID
      */
-    @TableField(value = "name")
-    private String name;
+    @TableField(value = "order_id")
+    private Long orderInfoId;
 
     /**
-     * 价格
+     * 用户ID
      */
-    @TableField(value = "price")
-    private Integer price;
+    @TableField(value = "user_id")
+    private Long userId;
 
     /**
-     * 库存
+     * 商品ID
      */
-    @TableField(value = "stock")
-    private Integer stock;
-
-    /**
-     * 版本号
-     */
-    @TableField(value = "`version`")
-    private Integer version;
+    @TableField(value = "goods_id")
+    private Long goodsId;
 
     private static final long serialVersionUID = 1L;
 
-    public static SkGoodsBuilder builder() {
-        return new SkGoodsBuilder();
+    public static SkOrderBuilder builder() {
+        return new SkOrderBuilder();
     }
 }

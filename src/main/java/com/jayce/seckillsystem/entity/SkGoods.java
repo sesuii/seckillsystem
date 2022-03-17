@@ -1,4 +1,4 @@
-package com.jayce.seckillsystem.domain;
+package com.jayce.seckillsystem.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * 参与秒杀的用户
+ * 秒杀商品
  *
  * @author <a href="mailto: su_1999@126.com">sujian</a>
  */
@@ -20,26 +20,28 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sk_user")
-public class SkUser implements Serializable {
+@TableName(value = "sk_goods")
+public class SkGoods implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
+    private Long id;
     /**
-     * 用户名
+     * 商品ID
      */
-    @TableField(value = "username")
-    private String username;
-
+    @TableField(value = "goods_id")
+    private Long goodsId;
     /**
-     * 密码
+     * 价格
      */
-    @TableField(value = "password")
-    private String password;
+    @TableField(value = "sk_price")
+    private Double skPrice;
+    /**
+     * 库存
+     */
+    @TableField(value = "stock")
+    private Integer stock;
 
     private static final long serialVersionUID = 1L;
-
-    public static SkUserBuilder builder() {
-        return new SkUserBuilder();
+    public static SkGoodsBuilder builder() {
+        return new SkGoodsBuilder();
     }
 }

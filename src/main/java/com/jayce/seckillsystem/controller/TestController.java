@@ -1,6 +1,6 @@
 package com.jayce.seckillsystem.controller;
 
-import com.jayce.seckillsystem.domain.SkUser;
+import com.jayce.seckillsystem.entity.SkUser;
 import com.jayce.seckillsystem.service.SkUserService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.LinkedMultiValueMap;
@@ -38,17 +38,17 @@ public class TestController {
         System.out.println(aaa);
     }
 
-    @GetMapping("/produceUserList")
-    public void produceUserList() {
-        List<SkUser> userList = new ArrayList<>(4000);
-        for (int i = 0; i < 4000; i++) {
-            userList.add(new SkUser(i, "user" + i, "123"));
-        }
-        skUserService.saveBatch(userList);
-        String url = "http://localhost:80/toDetail";
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>(2);
-        params.add("username", "zs");
-        params.add("password", "123");
-        String result = restTemplate.postForObject(url, params, String.class);
-    }
+//    @GetMapping("/produceUserList")
+//    public void produceUserList() {
+//        List<SkUser> userList = new ArrayList<>(4000);
+//        for (int i = 0; i < 4000; i++) {
+//            userList.add(new SkUser(i, "user" + i, "123"));
+//        }
+//        skUserService.saveBatch(userList);
+//        String url = "http://localhost:80/toDetail";
+//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>(2);
+//        params.add("username", "zs");
+//        params.add("password", "123");
+//        String result = restTemplate.postForObject(url, params, String.class);
+//    }
 }

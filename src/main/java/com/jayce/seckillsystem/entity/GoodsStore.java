@@ -1,4 +1,4 @@
-package com.jayce.seckillsystem.domain;
+package com.jayce.seckillsystem.entity;
 
 import com.jayce.seckillsystem.controller.SeckillController;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class GoodsStore {
      * 在 {@link SeckillController}中的{@code goodsStockWarmUp()}中初始化。
      * 初始化后不要修改该变量
      */
-    public static Map<Integer, Boolean> goodsSoldOut;
+    public static Map<Long, Boolean> goodsSoldOut;
 
 
 }

@@ -2,8 +2,8 @@ package com.jayce.seckillsystem.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jayce.seckillsystem.constant.RedisConstant;
-import com.jayce.seckillsystem.domain.SkGoods;
-import com.jayce.seckillsystem.domain.SkOrder;
+import com.jayce.seckillsystem.entity.SkGoods;
+import com.jayce.seckillsystem.entity.SkOrder;
 import com.jayce.seckillsystem.service.SeckillService;
 import com.jayce.seckillsystem.service.SkGoodsService;
 import com.jayce.seckillsystem.service.SkOrderService;
@@ -34,7 +34,7 @@ public class SeckillServiceImpl implements SeckillService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean seckill(Integer userId, Integer goodsId) throws Exception {
+    public boolean seckill(Long userId, Long goodsId) throws Exception {
 
         // 判断库存是否充足 (已优化为在 redis 中预减库存)
 //        boolean checkStock = checkStock(goodsId);
@@ -78,7 +78,7 @@ public class SeckillServiceImpl implements SeckillService {
      * @param goodsId 商品ID
      * @return true 表示库存足够
      */
-    private boolean checkStock(Integer goodsId) {
+    private boolean checkStock(Long goodsId) {
         // 先从 redis 中获取商品库存，减少去数据库查询库存的次数
 //        Integer redisStock = (Integer) redisTemplate.opsForValue().get(RedisConstant.GOODS_PREFIX + goodsId);
 //        if (redisStock != null && redisStock <= 0) {
@@ -95,7 +95,7 @@ public class SeckillServiceImpl implements SeckillService {
      * @param goodsId 商品ID
      * @return 1 表示扣减库存成功，否则表示失败
      */
-    private boolean reduceStock(Integer goodsId) {
+    private boolean reduceStock(Long goodsId) {
         SkGoods skGoods = skGoodsService.getById(goodsId);
         int newStock = skGoods.getStock() - 1;
         skGoods.setStock(newStock);
@@ -111,12 +111,11 @@ public class SeckillServiceImpl implements SeckillService {
      * @param goodsId 商品ID
      * @return
      */
-    private boolean addOrder(Integer userId, Integer goodsId) {
+    private boolean addOrder(Long userId, Long goodsId) {
         SkGoods skGoods = skGoodsService.getById(goodsId);
         SkOrder skOrder = SkOrder.builder()
                 .userId(userId)
                 .goodsId(goodsId)
-                .name(skGoods.getName())
                 .build();
         boolean save;
         try {
@@ -134,7 +133,7 @@ public class SeckillServiceImpl implements SeckillService {
      * @param goodsId 商品ID
      * @return 返回 true，表示用户重复秒杀同一件商品
      */
-    private boolean repeatSeckill(Integer userId, Integer goodsId) {
+    private boolean repeatSeckill(Integer userId, Long goodsId) {
         Boolean hasUser = redisTemplate.hasKey(userId + "__" + goodsId);
         if (hasUser != null && !hasUser) {
             return false;
