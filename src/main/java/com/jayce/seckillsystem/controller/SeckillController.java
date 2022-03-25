@@ -4,20 +4,23 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.google.common.util.concurrent.RateLimiter;
 import com.jayce.seckillsystem.constant.RedisConstant;
+import com.jayce.seckillsystem.constant.RestBeanEnum;
 import com.jayce.seckillsystem.entity.GoodsStore;
+import com.jayce.seckillsystem.entity.SkMessage;
 import com.jayce.seckillsystem.entity.User;
+import com.jayce.seckillsystem.entity.resp.RestBean;
 import com.jayce.seckillsystem.entity.vo.GoodsVo;
 import com.jayce.seckillsystem.rabbitmq.SkMessageSender;
 import com.jayce.seckillsystem.service.IGoodsService;
+import com.jayce.seckillsystem.service.IUserService;
 import com.jayce.seckillsystem.util.RedisLock;
 import com.jayce.seckillsystem.util.WebUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -32,7 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto: su_1999@126.com">sujian</a>
  */
 @RestController
-@RequestMapping("/api/seckill")
+@RequestMapping("/api")
+@Api(tags = "秒杀商品接口", value = "完成商品秒杀核心部分")
 @Slf4j
 public class SeckillController {
     @Resource
@@ -46,6 +50,9 @@ public class SeckillController {
 
     @Resource
     private DefaultRedisScript<Long> redisScript;
+
+    @Resource
+    private IUserService userService;
 
     @Resource
     private RedisLock redisLock;
@@ -71,41 +78,57 @@ public class SeckillController {
                 }
         );
     }
+    @ApiOperation("生成秒杀随机地址")
+    @GetMapping(value = "/skPath")
+    public RestBean<?> getPath(User user, Long goodsId, String captcha, HttpServletRequest request) {
+        if (user == null) {
+            return RestBean.failed(RestBeanEnum.AUTH_DENY);
+        }
+//        boolean check = orderService.checkCaptcha(user, goodsId, captcha);
+//        if (!check) {
+//            return RespBean.error(RespBeanEnum.ERROR_CAPTCHA);
+//        }
+//        String path = orderService.createPath(user, goodsId);
+//        return RespBean.success(path);
+        return null;
+    }
+
 
     /**
      * 秒杀商品
      *
      * @return
      */
-    @PostMapping("/goods")
-    public String seckillGoods(@RequestParam("goodsId") Long goodsId) {
-        // 判断用户是否登录
-//        SkUser skUser = isLogin();
-//        if (skUser == null) {
-//            log.info("用户未登录！");
-//            return "login";
+    @ApiOperation("秒杀操作")
+    @PostMapping("/sekillgoods")
+    public RestBean<?> seckillGoods(@RequestParam("goodsId") Long goodsId) {
+//        User user = isLogin();
+//        if (user == null) {
+//            return RestBean.failed(RestBeanEnum.AUTH_DENY);
 //        }
 
-        // 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
-        // 这里用了 synchronize 锁，所以效率会有所降低
+        // 验证路径是否有效？
+
+//        // 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
+//        // 这里用了 synchronize 锁，所以效率会有所降低
 //        if (!rateLimiter.tryAcquire(2, TimeUnit.SECONDS)) {
 //            log.info("被限流了！");
-//            return "fail";
+//            return RestBean.failed(RestBeanEnum.FAILED);
 //        }
-
-        // 使用随机字数字模拟 userId
-        long userId = new Random().nextInt(2000);
+        User user = User.builder()
+                .id((long) new Random().nextInt(100))
+                .build();
 
         // 判断商品是否卖完了
         if (hasSoldOut(goodsId)) {
             log.info("{}号商品已经卖完", goodsId);
-            return "fail";
+            return RestBean.failed(RestBeanEnum.GET_GOODS_IS_OVER);
         }
 
         // 判断用户是否重复秒杀某一商品
-        if (hasPurchased(userId, goodsId)) {
-            log.info("{}号顾客不能重复秒杀商品", userId);
-            return "fail";
+        if (hasPurchased(user.getId(), goodsId)) {
+            log.info("{}号顾客不能重复秒杀商品", user.getId());
+            return RestBean.failed(RestBeanEnum.GET_GOODS_IS_REUSE);
         }
 
         // 判断商品是否还有库存
@@ -113,19 +136,19 @@ public class SeckillController {
             // 标记商品已经卖完了
             log.info("{}号商品已经卖完", goodsId);
             GoodsStore.goodsSoldOut.put(goodsId, true);
-            return "fail";
+            return RestBean.failed(RestBeanEnum.GET_GOODS_IS_OVER);
         }
 
-//        // 创建秒杀信息
-//        SkMessage skMessage = SkMessage.builder()
-//                .userId(userId)
-//                .goodsId(goodsId)
-//                .build();
+        // 创建秒杀信息
+        SkMessage skMessage = SkMessage.builder()
+                .skUser(user)
+                .goodsId(goodsId)
+                .build();
 
-        // 将秒杀消息放入消息队列
-//        skMessageSender.send(JSON.toJSONString(skMessage));
+//         将秒杀消息放入消息队列
+        skMessageSender.send(JSON.toJSONString(skMessage));
 
-        return "success";
+        return RestBean.success();
     }
 
     /**
@@ -180,4 +203,5 @@ public class SeckillController {
         Long stock = redisTemplate.execute(redisScript, Collections.singletonList(RedisConstant.GOODS_PREFIX + goodsId));
         return stock != null && stock >= 0;
     }
+
 }

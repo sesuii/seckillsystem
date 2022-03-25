@@ -35,31 +35,14 @@ public class SeckillServiceImpl implements SeckillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean seckill(Long userId, Long goodsId) throws Exception {
-
-        // 判断库存是否充足 (已优化为在 redis 中预减库存)
-//        boolean checkStock = checkStock(goodsId);
-//        if (!checkStock) {
-//            log.info("{}用户库存不足！", userId);
-//            return false;
-//        }
-
-        // 判断用户是否重复秒杀（已优化为在 redis 中存储用户与商品信息）
-//        boolean repeatSeckill = repeatSeckill(userId, goodsId);
-//        if (repeatSeckill) {
-//            log.info("{}用户不能重复秒杀同一商品！", userId);
-//            return false;
-//        }
-
         // 扣减商品库存
         boolean reduceStock = reduceStock(goodsId);
         if (!reduceStock) {
             log.info("{}用户库存扣减失败！", userId);
             throw new Exception("用户库存扣减失败");
         }
-
         // 生成订单
         boolean addOrder = addOrder(userId, goodsId);
-
         if (!addOrder) {
             log.info("{}用户订单生成失败！", userId);
             throw new Exception("用户订单生成失败");
@@ -85,8 +68,8 @@ public class SeckillServiceImpl implements SeckillService {
             return false;
         }
         // 从数据库中获取库存
-//        int stock = skGoodsService.getStock(goodsId);
-        return true;
+        int stock = skGoodsService.getStock(goodsId);
+        return stock > 0;
     }
 
     /**

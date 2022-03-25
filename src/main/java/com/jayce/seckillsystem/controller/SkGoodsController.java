@@ -5,6 +5,8 @@ import com.jayce.seckillsystem.constant.RestBeanEnum;
 import com.jayce.seckillsystem.entity.resp.RestBean;
 import com.jayce.seckillsystem.entity.vo.GoodsVo;
 import com.jayce.seckillsystem.service.IGoodsService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,13 +19,14 @@ import java.util.List;
 
 /**
  * <p>
- *  前端控制器
+ *  商品信息接口
  * </p>
  *
  * @author YoungSong
  * @since 2022-03-23
  */
 @RestController
+@Api(tags = "商品信息接口", value = "获取秒杀商品列表，商品详情信息")
 @RequestMapping("/api/sk-goods")
 public class SkGoodsController {
 
@@ -33,28 +36,16 @@ public class SkGoodsController {
     @Resource
     RedisTemplate redisTemplate;
 
-    /**
-    * @Description 获取秒杀商品列表
-    *
-    * @Param []
-    * @return
-    *
-    * @Author YoungSong
-    **/
+
+    @ApiOperation("获取商品列表")
     @GetMapping("")
     public RestBean<List<GoodsVo>> skGoodsCategory() {
         List<GoodsVo> goodsList = goodsService.getGoodsList();
         return RestBean.success(goodsList);
     }
 
-    /**
-    * @Description 进入商品详情页面
-    *
-    * @Param [goodsId]
-    * @return
-    *
-    * @Author YoungSong
-    **/
+
+    @ApiOperation("获取商品详情信息")
     @GetMapping("/detail/goodsId={goodsId}")
     public RestBean<?> toDetail(@PathVariable Long goodsId) {
         ValueOperations valueOperations = redisTemplate.opsForValue();
