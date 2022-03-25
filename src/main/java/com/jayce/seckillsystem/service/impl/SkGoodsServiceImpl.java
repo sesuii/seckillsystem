@@ -26,7 +26,6 @@ public class SkGoodsServiceImpl extends ServiceImpl<SkGoodsMapper, SkGoods> impl
 
     @Override
     public int reduceStock(SkGoods skGoods) {
-
         return skGoodsMapper.reduceStock(skGoods);
     }
 }

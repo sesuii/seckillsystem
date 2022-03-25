@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jayce.seckillsystem.dao.SkGoodsMapper">
+
+    <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.jayce.seckillsystem.entity.SkGoods">
-        <!--@mbg.generated-->
-        <!--@Table sk_goods-->
-        <id column="id" jdbcType="INTEGER" property="id"/>
-        <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="price" jdbcType="INTEGER" property="price"/>
-        <result column="stock" jdbcType="INTEGER" property="stock"/>
+        <id column="id" property="id" />
+        <result column="goods_id" property="goodsId" />
+        <result column="sk_price" property="skPrice" />
+        <result column="stock" property="stock" />
+        <result column="start_date_time" property="startDateTime" />
+        <result column="end_date_time" property="endDateTime" />
     </resultMap>
+
+    <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        <!--@mbg.generated-->
-        id, `name`, price, stock
+        id, goods_id, sk_price, stock, start_date_time, end_date_time
     </sql>
+
 </mapper>

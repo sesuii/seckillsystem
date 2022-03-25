@@ -1,10 +1,6 @@
 package com.jayce.seckillsystem.controller;
 
-import com.jayce.seckillsystem.entity.SkUser;
-import com.jayce.seckillsystem.service.SkUserService;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 测试类
@@ -29,8 +23,6 @@ public class TestController {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
-    @Resource
-    private SkUserService skUserService;
 
     @GetMapping("/user/{id}")
     public void te(@PathVariable("id") Integer id) {

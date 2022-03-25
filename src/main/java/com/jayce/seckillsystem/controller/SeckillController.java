@@ -5,20 +5,19 @@ import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.google.common.util.concurrent.RateLimiter;
 import com.jayce.seckillsystem.constant.RedisConstant;
 import com.jayce.seckillsystem.entity.GoodsStore;
-import com.jayce.seckillsystem.entity.SkGoods;
-import com.jayce.seckillsystem.entity.SkMessage;
-import com.jayce.seckillsystem.entity.SkUser;
+import com.jayce.seckillsystem.entity.User;
+import com.jayce.seckillsystem.entity.vo.GoodsVo;
 import com.jayce.seckillsystem.rabbitmq.SkMessageSender;
-import com.jayce.seckillsystem.service.SkGoodsService;
+import com.jayce.seckillsystem.service.IGoodsService;
 import com.jayce.seckillsystem.util.RedisLock;
 import com.jayce.seckillsystem.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -32,15 +31,15 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author <a href="mailto: su_1999@126.com">sujian</a>
  */
-@Controller
-@RequestMapping("/seckill")
+@RestController
+@RequestMapping("/api/seckill")
 @Slf4j
 public class SeckillController {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     @Resource
-    private SkGoodsService skGoodsService;
+    private IGoodsService goodsService;
 
     @Resource
     private SkMessageSender skMessageSender;
@@ -62,8 +61,8 @@ public class SeckillController {
      */
     @PostConstruct
     public void goodsStockWarmUp() {
-        List<SkGoods> skGoodsList = skGoodsService.list();
-        long goodsCount = skGoodsService.count();
+        List<GoodsVo> skGoodsList = goodsService.getGoodsList();
+        long goodsCount = goodsService.count();
         GoodsStore.goodsSoldOut = new ConcurrentHashMap<>((int) (goodsCount / 0.75 + 1));
         skGoodsList.forEach(
                 skGoods -> {
@@ -117,14 +116,14 @@ public class SeckillController {
             return "fail";
         }
 
-        // 创建秒杀信息
-        SkMessage skMessage = SkMessage.builder()
-                .userId(userId)
-                .goodsId(goodsId)
-                .build();
+//        // 创建秒杀信息
+//        SkMessage skMessage = SkMessage.builder()
+//                .userId(userId)
+//                .goodsId(goodsId)
+//                .build();
 
         // 将秒杀消息放入消息队列
-        skMessageSender.send(JSON.toJSONString(skMessage));
+//        skMessageSender.send(JSON.toJSONString(skMessage));
 
         return "success";
     }
@@ -134,7 +133,7 @@ public class SeckillController {
      *
      * @return 返回 null 表示未登录
      */
-    private SkUser isLogin() {
+    private User isLogin() {
         HttpServletRequest request = WebUtil.getRequest();
         Cookie[] cookies = request.getCookies();
         if (ArrayUtils.isEmpty(cookies)) {
@@ -144,7 +143,7 @@ public class SeckillController {
                 .filter(cookie -> cookie.getName().equals(RedisConstant.COOKIE_NAME))
                 .map(cookie -> redisTemplate.opsForValue().get(cookie.getValue()))
                 .findFirst();
-        return skUserStr.map(s -> JSON.parseObject(s.toString(), SkUser.class)).orElse(null);
+        return skUserStr.map(s -> JSON.parseObject(s.toString(), User.class)).orElse(null);
     }
 
     /**

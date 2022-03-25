@@ -1,6 +1,6 @@
 package com.jayce.seckillsystem.config;
 
-import com.jayce.seckillsystem.service.AuthService;
+import com.jayce.seckillsystem.service.impl.AuthServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
-    AuthService authService;
+    AuthServiceImpl authService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

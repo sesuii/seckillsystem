@@ -15,6 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SkMessage {
-    private Long userId;
+    private User skUser;
     private Long goodsId;
 }

@@ -1,58 +1,55 @@
 package com.jayce.seckillsystem.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.jayce.seckillsystem.entity.Account;
+import com.jayce.seckillsystem.constant.RestBeanEnum;
+import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.resp.RestBean;
-import com.jayce.seckillsystem.service.AccountService;
+import com.jayce.seckillsystem.entity.vo.UserVo;
+import com.jayce.seckillsystem.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-@Api(tags = "用户认证接口", description = "包括用户登录、注册操作")
+@Api(tags = "用户认证接口", value = "包括用户登录、注册操作")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     @Resource
-    private AccountService accountService;
+    IUserService userService;
 
     @ApiOperation("用户注册")
     @PostMapping("/register")
-    public RestBean<Void> register(String username,
+    public RestBean<User> register(String username,
                                    String identityId,
                                    String mobilePhone,
                                    String password) {
-        accountService.createAccount(username, identityId, mobilePhone, password);
-        return new RestBean<>(200, "注册账号成功！");
+        return  userService.createAccount(username, identityId, mobilePhone, password);
     }
-    @ApiOperation("登录成功")
-    @PostMapping("/login-success")
-    public RestBean<Void> loginSuccess() {
-        return new RestBean<>(200, "登录成功！");
+
+    @ApiOperation("用户登录")
+    @PostMapping(value = "/doLogin")
+    public RestBean<?> doLogin(UserVo userVo, HttpServletRequest request, HttpServletResponse response) {
+        return userService.doLongin(userVo, request, response);
     }
-    @ApiOperation("登录失败")
-    @PostMapping("/login-failure")
-    public RestBean<Void> login() {
-        return new RestBean<>(304, "登录失败！");
-    }
+
     @ApiOperation("退出登录")
     @GetMapping("/logout-success")
-    public RestBean<Void> logoutSuccess() {
-        return new RestBean<>(200, "退出成功");
+    public RestBean<?> logoutSuccess() {
+        return RestBean.success();
     }
+
     @ApiOperation("未登录拒绝访问")
     @RequestMapping("/access-deny")
-    public RestBean<Void> accessDeny() {
-        return new RestBean<>(401, "请先进行登录再操作");
+    public RestBean<?> accessDeny() {
+        return RestBean.failed(RestBeanEnum.AUTH_DENY);
     }
 
 }

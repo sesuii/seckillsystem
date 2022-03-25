@@ -25,4 +25,5 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("com.jayce.seckillsystem.controller"))
                 .build();
     }
+
 }

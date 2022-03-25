@@ -9,7 +9,7 @@ public class RedisConstant {
     /**
      * cookie 名
      */
-    public static final String COOKIE_NAME = "skuser";
+    public static final String COOKIE_NAME = "user_mobile";
 
     /**
      * 某商品的秒杀时间（单位：秒）

@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jayce.seckillsystem.constant.RedisConstant;
 import com.jayce.seckillsystem.entity.SkGoods;
 import com.jayce.seckillsystem.entity.SkOrder;
+import com.jayce.seckillsystem.service.ISkOrderService;
 import com.jayce.seckillsystem.service.SeckillService;
 import com.jayce.seckillsystem.service.SkGoodsService;
-import com.jayce.seckillsystem.service.SkOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SeckillServiceImpl implements SeckillService {
     @Resource
-    private SkOrderService skOrderService;
+    private ISkOrderService skOrderService;
 
     @Resource
     private SkGoodsService skGoodsService;
@@ -80,13 +80,13 @@ public class SeckillServiceImpl implements SeckillService {
      */
     private boolean checkStock(Long goodsId) {
         // 先从 redis 中获取商品库存，减少去数据库查询库存的次数
-//        Integer redisStock = (Integer) redisTemplate.opsForValue().get(RedisConstant.GOODS_PREFIX + goodsId);
-//        if (redisStock != null && redisStock <= 0) {
-//            return false;
-//        }
+        Integer redisStock = (Integer) redisTemplate.opsForValue().get(RedisConstant.GOODS_PREFIX + goodsId);
+        if (redisStock != null && redisStock <= 0) {
+            return false;
+        }
         // 从数据库中获取库存
-        int stock = skGoodsService.getStock(goodsId);
-        return stock > 0;
+//        int stock = skGoodsService.getStock(goodsId);
+        return true;
     }
 
     /**
