@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jayce.seckillsystem.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jayce.seckillsystem.entity.User">
+        <id column="id" property="id" />
+        <result column="realname" property="realname" />
+        <result column="pwd" property="pwd" />
+        <result column="mobile_phone" property="mobilePhone" />
+        <result column="identity_id" property="identityId" />
+        <result column="create_time" property="createTime" />
+        <result column="last_update_time" property="lastUpdateTime" />
+        <result column="last_login_ip" property="lastLoginIp" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, realname, pwd, mobile_phone, identity_id, create_time, last_update_time, last_login_ip, deleted
+    </sql>
+
+</mapper>
