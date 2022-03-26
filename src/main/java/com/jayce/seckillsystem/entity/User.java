@@ -16,9 +16,9 @@ import java.util.Date;
  * @since 2022-03-23
  */
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @EqualsAndHashCode(callSuper = false)
 public class User implements Serializable {
 

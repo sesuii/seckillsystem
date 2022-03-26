@@ -148,7 +148,7 @@ public class SeckillController {
 //         将秒杀消息放入消息队列
         skMessageSender.send(JSON.toJSONString(skMessage));
 
-        return RestBean.success();
+        return RestBean.success(user);
     }
 
     /**

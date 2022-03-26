@@ -21,6 +21,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -61,8 +62,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .identityId(identityId)
                 .mobilePhone(mobilePhone)
                 .pwd(encoder.encode(password))
+                .lastLoginIp("0.0.0.0")
                 .build();
         userMapper.insert(user);
+        user = userMapper.selectById(user.getId());
+        user.setPwd("");
         return RestBean.success(user);
     }
 
