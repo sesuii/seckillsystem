@@ -2,6 +2,7 @@ package com.jayce.seckillsystem.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,6 +19,7 @@ import java.util.Date;
  * @since 2022-03-23
  */
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = false)
 public class OrderInfo implements Serializable {
 
@@ -52,7 +54,7 @@ public class OrderInfo implements Serializable {
     private BigDecimal goodsPrice;
 
     /**
-     * 订单状态 0新建 1已完成 2取消支付
+     * 订单状态 0新建 1已完成
      */
     private Boolean status;
 

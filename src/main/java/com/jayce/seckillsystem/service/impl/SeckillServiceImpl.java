@@ -2,17 +2,19 @@ package com.jayce.seckillsystem.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jayce.seckillsystem.constant.RedisConstant;
+import com.jayce.seckillsystem.entity.Goods;
+import com.jayce.seckillsystem.entity.OrderInfo;
 import com.jayce.seckillsystem.entity.SkGoods;
 import com.jayce.seckillsystem.entity.SkOrder;
-import com.jayce.seckillsystem.service.ISkOrderService;
-import com.jayce.seckillsystem.service.SeckillService;
-import com.jayce.seckillsystem.service.SkGoodsService;
+import com.jayce.seckillsystem.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,6 +34,12 @@ public class SeckillServiceImpl implements SeckillService {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Resource
+    private IGoodsService goodsService;
+
+    @Resource
+    private IOrderInfoService orderInfoService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean seckill(Long userId, Long goodsId) throws Exception {
@@ -42,8 +50,8 @@ public class SeckillServiceImpl implements SeckillService {
             throw new Exception("用户库存扣减失败");
         }
         // 生成订单
-        boolean addOrder = addOrder(userId, goodsId);
-        if (!addOrder) {
+        boolean add = addOrder(userId, goodsId);
+        if (!add) {
             log.info("{}用户订单生成失败！", userId);
             throw new Exception("用户订单生成失败");
         }
@@ -95,18 +103,33 @@ public class SeckillServiceImpl implements SeckillService {
      * @return
      */
     private boolean addOrder(Long userId, Long goodsId) {
-        SkGoods skGoods = skGoodsService.getById(goodsId);
+        Goods goods = goodsService.getById(goodsId);
+        boolean isSaveSkOrder, isSaveOrderInfo;
+        // 创建订单
+        OrderInfo order =OrderInfo.builder()
+                .goodsId(goodsId)
+                .userId(userId)
+                .status(false)
+                .createTime(new Date())
+                .goodsPrice(goods.getGoodsPrice())
+                .goodsCount(1)
+                .goodsName(goods.getGoodsName())
+                .build();
+        isSaveOrderInfo = orderInfoService.save(order);
+        System.out.println(order.getId());
+        // 创建秒杀订单
         SkOrder skOrder = SkOrder.builder()
+                .orderInfoId(order.getId())
                 .userId(userId)
                 .goodsId(goodsId)
                 .build();
-        boolean save;
+
         try {
-            save = skOrderService.save(skOrder);
+            isSaveSkOrder = skOrderService.save(skOrder);
         } catch (Exception e) {
             throw e;
         }
-        return save;
+        return isSaveSkOrder && isSaveOrderInfo;
     }
 
     /**

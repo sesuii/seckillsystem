@@ -51,7 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     * @Author YoungSong
     **/
     @Override
-    public RestBean<User> createAccount(String username, String identityId, String mobilePhone, String password) {
+    public RestBean<?> createAccount(String username, String identityId, String mobilePhone, String password) {
         User user = getOne(new LambdaQueryWrapper<User>()
                 .eq(User::getIdentityId, identityId)
         );
@@ -66,12 +66,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .build();
         userMapper.insert(user);
         user = userMapper.selectById(user.getId());
-        user.setPwd("");
         return RestBean.success(user);
     }
 
     @Override
-    public RestBean doLongin(UserVo userVo, HttpServletRequest request, HttpServletResponse response) {
+    public RestBean<?> doLongin(UserVo userVo, HttpServletRequest request, HttpServletResponse response) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String mobilePhone = userVo.getMobile();
         String password = userVo.getPassword();

@@ -12,6 +12,7 @@ import com.jayce.seckillsystem.entity.resp.RestBean;
 import com.jayce.seckillsystem.entity.vo.GoodsVo;
 import com.jayce.seckillsystem.rabbitmq.SkMessageSender;
 import com.jayce.seckillsystem.service.IGoodsService;
+import com.jayce.seckillsystem.service.ISkOrderService;
 import com.jayce.seckillsystem.service.IUserService;
 import com.jayce.seckillsystem.util.RedisLock;
 import com.jayce.seckillsystem.util.WebUtil;
@@ -55,9 +56,12 @@ public class SeckillController {
     private IUserService userService;
 
     @Resource
+    private ISkOrderService skOrderService;
+
+    @Resource
     private RedisLock redisLock;
 
-    private RateLimiter rateLimiter = RateLimiter.create(200);
+//    private RateLimiter rateLimiter = RateLimiter.create(200);
 
     /**
      * 库存预热
@@ -78,19 +82,13 @@ public class SeckillController {
                 }
         );
     }
+
     @ApiOperation("生成秒杀随机地址")
     @GetMapping(value = "/skPath")
-    public RestBean<?> getPath(User user, Long goodsId, String captcha, HttpServletRequest request) {
-        if (user == null) {
-            return RestBean.failed(RestBeanEnum.AUTH_DENY);
-        }
-//        boolean check = orderService.checkCaptcha(user, goodsId, captcha);
-//        if (!check) {
-//            return RespBean.error(RespBeanEnum.ERROR_CAPTCHA);
-//        }
-//        String path = orderService.createPath(user, goodsId);
-//        return RespBean.success(path);
-        return null;
+    public RestBean<?> getPath(User user, Long goodsId) {
+        if(user == null) return RestBean.failed(RestBeanEnum.AUTH_DENY);
+        String skPath = skOrderService.createPath(user, goodsId);
+        return RestBean.success(skPath);
     }
 
 
@@ -100,14 +98,8 @@ public class SeckillController {
      * @return
      */
     @ApiOperation("秒杀操作")
-    @PostMapping("/sekillgoods")
-    public RestBean<?> seckillGoods(@RequestParam("goodsId") Long goodsId) {
-//        User user = isLogin();
-//        if (user == null) {
-//            return RestBean.failed(RestBeanEnum.AUTH_DENY);
-//        }
-
-        // 验证路径是否有效？
+    @PostMapping("/{skPath}/sekillgoods")
+    public RestBean<?> seckillGoods(@PathVariable String skPath, @RequestParam("goodsId") Long goodsId) {
 
 //        // 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
 //        // 这里用了 synchronize 锁，所以效率会有所降低
@@ -116,8 +108,11 @@ public class SeckillController {
 //            return RestBean.failed(RestBeanEnum.FAILED);
 //        }
         User user = User.builder()
-                .id((long) new Random().nextInt(100))
-                .build();
+                        .id(1L)
+                        .mobilePhone("1801234")
+                        .build();
+        boolean isLegalPath = skOrderService.checkPath(user, goodsId, skPath);
+        if(!isLegalPath) return RestBean.failed(RestBeanEnum.FAILED);
 
         // 判断商品是否卖完了
         if (hasSoldOut(goodsId)) {
@@ -130,7 +125,6 @@ public class SeckillController {
             log.info("{}号顾客不能重复秒杀商品", user.getId());
             return RestBean.failed(RestBeanEnum.GET_GOODS_IS_REUSE);
         }
-
         // 判断商品是否还有库存
         if (!hasStock(goodsId)) {
             // 标记商品已经卖完了
@@ -138,7 +132,6 @@ public class SeckillController {
             GoodsStore.goodsSoldOut.put(goodsId, true);
             return RestBean.failed(RestBeanEnum.GET_GOODS_IS_OVER);
         }
-
         // 创建秒杀信息
         SkMessage skMessage = SkMessage.builder()
                 .skUser(user)
@@ -147,8 +140,7 @@ public class SeckillController {
 
 //         将秒杀消息放入消息队列
         skMessageSender.send(JSON.toJSONString(skMessage));
-
-        return RestBean.success(user);
+        return RestBean.success("秒杀成功");
     }
 
     /**

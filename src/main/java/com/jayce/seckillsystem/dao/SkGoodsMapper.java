@@ -26,7 +26,6 @@ public interface SkGoodsMapper extends BaseMapper<SkGoods> {
      *
      * @param skGoods 商品
      */
-//    @Update("update sk_goods set stock = stock - 1, version = version + 1 where id = #{id} and version = #{version}")
     @Update("update sk_goods set stock = stock - 1 where goods_id = #{goodsId} and stock > 0")
     int reduceStock(SkGoods skGoods);
 }

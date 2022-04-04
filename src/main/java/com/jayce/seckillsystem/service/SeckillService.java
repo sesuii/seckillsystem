@@ -1,5 +1,7 @@
 package com.jayce.seckillsystem.service;
 
+import com.jayce.seckillsystem.entity.OrderInfo;
+
 /**
  * SeckillService
  *

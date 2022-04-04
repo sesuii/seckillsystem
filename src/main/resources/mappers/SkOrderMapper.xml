@@ -5,12 +5,12 @@
         <!--@mbg.generated-->
         <!--@Table sk_order-->
         <id column="id" jdbcType="INTEGER" property="id"/>
-        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="order_id" jdbcType="INTEGER" property="orderId"/>
         <result column="user_id" jdbcType="INTEGER" property="userId"/>
         <result column="goods_id" jdbcType="INTEGER" property="goodsId"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id, `name`, user_id, goods_id
+        id, order_id, user_id, goods_id
     </sql>
 </mapper>

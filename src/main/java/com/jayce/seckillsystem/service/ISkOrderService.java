@@ -2,6 +2,7 @@ package com.jayce.seckillsystem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jayce.seckillsystem.entity.SkOrder;
+import com.jayce.seckillsystem.entity.User;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,4 +15,7 @@ import org.springframework.stereotype.Service;
  */
 public interface ISkOrderService extends IService<SkOrder> {
 
+    String createPath(User user, Long goodsId);
+
+    boolean checkPath(User user, Long goodsId, String path);
 }

@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface IUserService extends IService<User> {
 
-    RestBean<User> createAccount(String username, String identityId, String mobilePhone, String password);
+    RestBean<?> createAccount(String username, String identityId, String mobilePhone, String password);
 
-    RestBean doLongin(UserVo userVo, HttpServletRequest request, HttpServletResponse response);
+    RestBean<?> doLongin(UserVo userVo, HttpServletRequest request, HttpServletResponse response);
 }

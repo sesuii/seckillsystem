@@ -33,9 +33,6 @@ public class SkGoodsController {
     @Resource
     IGoodsService goodsService;
 
-    @Resource
-    RedisTemplate redisTemplate;
-
 
     @ApiOperation("获取商品列表")
     @GetMapping("")
@@ -48,7 +45,6 @@ public class SkGoodsController {
     @ApiOperation("获取商品详情信息")
     @GetMapping("/detail/goodsId={goodsId}")
     public RestBean<?> toDetail(@PathVariable Long goodsId) {
-        ValueOperations valueOperations = redisTemplate.opsForValue();
         GoodsVo goodsVo = goodsService.findGoodsVoById(goodsId);
         if(goodsVo == null) {
             return RestBean.failed(RestBeanEnum.GET_GOODS_NOT_FOUND);

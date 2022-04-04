@@ -27,7 +27,7 @@ public class AuthController {
 
     @ApiOperation("用户注册")
     @PostMapping("/register")
-    public RestBean<User> register(String username,
+    public RestBean<?> register(String username,
                                    String identityId,
                                    String mobilePhone,
                                    String password) {

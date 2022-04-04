@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 @Service
-public class AuthServiceImpl implements UserDetailsService {
+public class AuthService implements UserDetailsService {
 
     @Resource
     IUserService iUserService;
@@ -22,7 +22,7 @@ public class AuthServiceImpl implements UserDetailsService {
                 new LambdaQueryWrapper<com.jayce.seckillsystem.entity.User>()
                         .eq(com.jayce.seckillsystem.entity.User::getMobilePhone, mobilePhone)
         );
-        if(user == null) throw new UsernameNotFoundException("");
+        if(user == null) throw new UsernameNotFoundException("该用户不存在");
         return User
                 .withUsername(user.getMobilePhone())
                 .password(user.getPwd())

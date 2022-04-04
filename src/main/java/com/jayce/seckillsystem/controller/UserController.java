@@ -44,6 +44,7 @@ public class UserController {
     @GetMapping("/user-info")
     public RestBean<?> info() {
         SecurityContext context = SecurityContextHolder.getContext();
+        System.out.println(context.getAuthentication().getName());
         User user = userService.getOne(
                 new LambdaQueryWrapper<User>()
                         .eq(User::getMobilePhone, context.getAuthentication().getName())
