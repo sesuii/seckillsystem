@@ -19,21 +19,20 @@ public class RestBean<T> {
         this.reason = reason;
     }
 
-    public static RestBean success() {
-        return new RestBean(RestBeanEnum.SUCCESS.getCode(), RestBeanEnum.SUCCESS.getMessage());
+    public static RestBean<?> success() {
+        return new RestBean<>(RestBeanEnum.SUCCESS.getCode(), RestBeanEnum.SUCCESS.getMessage());
     }
 
-    public static RestBean success(Object obj) {
-        return new RestBean(RestBeanEnum.SUCCESS.getCode(), RestBeanEnum.SUCCESS.getMessage(), obj);
+    public static RestBean<?> success(Object obj) {
+        return new RestBean<>(RestBeanEnum.SUCCESS.getCode(), RestBeanEnum.SUCCESS.getMessage(), obj);
     }
 
-    public static RestBean failed(RestBeanEnum restBeanEnum) {
-        return new RestBean(restBeanEnum.getCode(), restBeanEnum.getMessage());
+    public static RestBean<?> failed(RestBeanEnum restBeanEnum) {
+        return new RestBean<>(restBeanEnum.getCode(), restBeanEnum.getMessage());
     }
 
-    public static RestBean failed(RestBeanEnum restBeanEnum, Object obj) {
-        return new RestBean(restBeanEnum.getCode(), restBeanEnum.getMessage(), obj);
+    public static RestBean<?> failed(RestBeanEnum restBeanEnum, Object obj) {
+        return new RestBean<>(restBeanEnum.getCode(), restBeanEnum.getMessage(), obj);
     }
-
 
 }

@@ -109,7 +109,7 @@ public class SeckillServiceImpl implements SeckillService {
         OrderInfo order =OrderInfo.builder()
                 .goodsId(goodsId)
                 .userId(userId)
-                .status(false)
+                .status((byte) 0)
                 .createTime(new Date())
                 .goodsPrice(goods.getGoodsPrice())
                 .goodsCount(1)

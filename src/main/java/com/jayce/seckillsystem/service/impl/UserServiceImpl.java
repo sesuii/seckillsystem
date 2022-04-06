@@ -70,7 +70,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public RestBean<?> doLongin(UserVo userVo, HttpServletRequest request, HttpServletResponse response) {
+    public RestBean<?> doLogin(UserVo userVo) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String mobilePhone = userVo.getMobile();
         String password = userVo.getPassword();

@@ -18,4 +18,6 @@ public interface ISkOrderService extends IService<SkOrder> {
     String createPath(User user, Long goodsId);
 
     boolean checkPath(User user, Long goodsId, String path);
+
+    Long getResult(User user, Long goodsId);
 }

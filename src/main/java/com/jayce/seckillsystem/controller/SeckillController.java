@@ -10,6 +10,7 @@ import com.jayce.seckillsystem.entity.SkMessage;
 import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.resp.RestBean;
 import com.jayce.seckillsystem.entity.vo.GoodsVo;
+import com.jayce.seckillsystem.entity.vo.UserVo;
 import com.jayce.seckillsystem.rabbitmq.SkMessageSender;
 import com.jayce.seckillsystem.service.IGoodsService;
 import com.jayce.seckillsystem.service.ISkOrderService;
@@ -91,7 +92,6 @@ public class SeckillController {
         return RestBean.success(skPath);
     }
 
-
     /**
      * 秒杀商品
      *
@@ -99,18 +99,14 @@ public class SeckillController {
      */
     @ApiOperation("秒杀操作")
     @PostMapping("/{skPath}/sekillgoods")
-    public RestBean<?> seckillGoods(@PathVariable String skPath, @RequestParam("goodsId") Long goodsId) {
-
+    public RestBean<?> seckillGoods(@PathVariable String skPath, User user, Long goodsId) {
 //        // 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
 //        // 这里用了 synchronize 锁，所以效率会有所降低
 //        if (!rateLimiter.tryAcquire(2, TimeUnit.SECONDS)) {
 //            log.info("被限流了！");
 //            return RestBean.failed(RestBeanEnum.FAILED);
 //        }
-        User user = User.builder()
-                        .id(1L)
-                        .mobilePhone("1801234")
-                        .build();
+        // 验证秒杀地址是否有效
         boolean isLegalPath = skOrderService.checkPath(user, goodsId, skPath);
         if(!isLegalPath) return RestBean.failed(RestBeanEnum.FAILED);
 
@@ -129,7 +125,7 @@ public class SeckillController {
         if (!hasStock(goodsId)) {
             // 标记商品已经卖完了
             log.info("{}号商品已经卖完", goodsId);
-            GoodsStore.goodsSoldOut.put(goodsId, true);
+            GoodsStore.goodsSoldOut.put(goodsId, true); // 内存标记
             return RestBean.failed(RestBeanEnum.GET_GOODS_IS_OVER);
         }
         // 创建秒杀信息
@@ -141,6 +137,17 @@ public class SeckillController {
 //         将秒杀消息放入消息队列
         skMessageSender.send(JSON.toJSONString(skMessage));
         return RestBean.success("秒杀成功");
+    }
+
+
+    @ApiOperation("获取秒杀结果")
+    @GetMapping("getResult")
+    public RestBean<?> getResult(User user, Long goodsId) {
+        if (user == null) {
+            return RestBean.failed(RestBeanEnum.AUTH_DENY);
+        }
+        Long orderId = skOrderService.getResult(user, goodsId);
+        return RestBean.success(orderId);
     }
 
     /**

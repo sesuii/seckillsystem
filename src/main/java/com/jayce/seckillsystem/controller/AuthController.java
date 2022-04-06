@@ -36,8 +36,8 @@ public class AuthController {
 
     @ApiOperation("用户登录")
     @PostMapping(value = "/doLogin")
-    public RestBean<?> doLogin(UserVo userVo, HttpServletRequest request, HttpServletResponse response) {
-        return userService.doLongin(userVo, request, response);
+    public RestBean<?> doLogin(UserVo userVo) {
+        return userService.doLogin(userVo);
     }
 
     @ApiOperation("退出登录")

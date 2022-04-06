@@ -2,6 +2,7 @@ package com.jayce.seckillsystem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jayce.seckillsystem.entity.OrderInfo;
+import com.jayce.seckillsystem.entity.resp.RestBean;
 import com.jayce.seckillsystem.entity.vo.OrderInfoVo;
 
 /**
@@ -14,5 +15,9 @@ import com.jayce.seckillsystem.entity.vo.OrderInfoVo;
  */
 public interface IOrderInfoService extends IService<OrderInfo> {
 
-    OrderInfoVo detail(Long orderId);
+    RestBean<?> detail(Long orderId);
+
+    RestBean<?> payOrder(Long orderId) throws Exception;
+
+    RestBean<?> cancelOrder(OrderInfo orderInfo) throws Exception;
 }

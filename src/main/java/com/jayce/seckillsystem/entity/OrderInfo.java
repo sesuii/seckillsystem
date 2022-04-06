@@ -54,9 +54,9 @@ public class OrderInfo implements Serializable {
     private BigDecimal goodsPrice;
 
     /**
-     * 订单状态 0新建 1已完成
+     * 订单状态 0新建 1已完成 2取消订单
      */
-    private Boolean status;
+    private Byte status;
 
     /**
      *  创建时间

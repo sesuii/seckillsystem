@@ -36,7 +36,7 @@ public class SkGoodsController {
 
     @ApiOperation("获取商品列表")
     @GetMapping("")
-    public RestBean<List<GoodsVo>> skGoodsCategory() {
+    public RestBean<?> skGoodsCategory() {
         List<GoodsVo> goodsList = goodsService.getGoodsList();
         return RestBean.success(goodsList);
     }

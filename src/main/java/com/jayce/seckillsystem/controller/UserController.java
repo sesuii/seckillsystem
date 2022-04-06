@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jayce.seckillsystem.constant.RestBeanEnum;
 import com.jayce.seckillsystem.entity.User;
+import com.jayce.seckillsystem.entity.UserFinancial;
 import com.jayce.seckillsystem.entity.resp.RestBean;
+import com.jayce.seckillsystem.service.IUserFinancialService;
 import com.jayce.seckillsystem.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.websocket.server.PathParam;
 
 /**
  * <p>
@@ -32,6 +35,8 @@ public class UserController {
 
     @Resource
     private IUserService userService;
+    @Resource
+    private IUserFinancialService userFinancialService;
 
     /**
     * @Description 获取用户信息
@@ -53,4 +58,10 @@ public class UserController {
         return RestBean.success(user);
     }
 
+    @ApiOperation("用户账户信息接口")
+    @GetMapping("/{userId}account")
+    public RestBean<?> getUserAccount(@PathParam("userId") Long userId) {
+        UserFinancial userFinancial = userFinancialService.getById(userId);
+        return RestBean.success(userFinancial);
+    }
 }

@@ -20,5 +20,5 @@ public interface IUserService extends IService<User> {
 
     RestBean<?> createAccount(String username, String identityId, String mobilePhone, String password);
 
-    RestBean<?> doLongin(UserVo userVo, HttpServletRequest request, HttpServletResponse response);
+    RestBean<?> doLogin(UserVo userVo);
 }

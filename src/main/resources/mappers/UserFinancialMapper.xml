@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jayce.seckillsystem.dao.UserFinancialMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jayce.seckillsystem.entity.UserFinancial">
+        <id column="id" property="id" />
+        <result column="card_number" property="cardnumber" />
+        <result column="balance" property="balance" />
+        <result column="integrity_degree" property="integrityDegree" />
+        <result column="work_status" property="workStatus" />
+        <result column="over_count" property="overCount" />
+        <result column="over_amount" property="overAmount" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, card_number, balance, integrity_degree, work_status, over_count, over_amount
+    </sql>
+
+</mapper>
