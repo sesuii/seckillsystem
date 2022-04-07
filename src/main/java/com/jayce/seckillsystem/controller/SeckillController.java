@@ -53,14 +53,10 @@ public class SeckillController {
     @Resource
     private DefaultRedisScript<Long> redisScript;
 
-    @Resource
-    private IUserService userService;
 
     @Resource
     private ISkOrderService skOrderService;
 
-    @Resource
-    private RedisLock redisLock;
 
 //    private RateLimiter rateLimiter = RateLimiter.create(200);
 
@@ -99,7 +95,7 @@ public class SeckillController {
      */
     @ApiOperation("秒杀操作")
     @PostMapping("/{skPath}/sekillgoods")
-    public RestBean<?> seckillGoods(@PathVariable String skPath, User user, Long goodsId) {
+    public RestBean<?> seckillGoods(@PathVariable String skPath, @RequestBody User user, Long goodsId) {
 //        // 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
 //        // 这里用了 synchronize 锁，所以效率会有所降低
 //        if (!rateLimiter.tryAcquire(2, TimeUnit.SECONDS)) {
@@ -107,9 +103,11 @@ public class SeckillController {
 //            return RestBean.failed(RestBeanEnum.FAILED);
 //        }
         // 验证秒杀地址是否有效
+        System.out.println(user);
+        System.out.println("hear1");
         boolean isLegalPath = skOrderService.checkPath(user, goodsId, skPath);
         if(!isLegalPath) return RestBean.failed(RestBeanEnum.FAILED);
-
+        System.out.println("hear2");
         // 判断商品是否卖完了
         if (hasSoldOut(goodsId)) {
             log.info("{}号商品已经卖完", goodsId);

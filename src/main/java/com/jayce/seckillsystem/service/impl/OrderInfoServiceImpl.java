@@ -76,7 +76,6 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     * @return
     *
     **/
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public RestBean<?> payOrder(Long orderId) throws Exception {
