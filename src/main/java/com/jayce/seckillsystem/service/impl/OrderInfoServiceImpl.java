@@ -50,6 +50,13 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Resource
     ITradeRecordService tradeRecordService;
 
+    /**
+    * @Description 获取订单详情信息
+    *
+    * @param orderId 订单号
+    * @return
+    *
+    **/
     @Override
     public RestBean<?> detail(Long orderId) {
         OrderInfo order = orderInfoService.getById(orderId);
@@ -62,6 +69,13 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         return RestBean.success(orderInfoVo);
     }
 
+    /**
+    * @Description 支付订单
+    *
+    * @param orderId 订单id
+    * @return
+    *
+    **/
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -111,6 +125,13 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         return RestBean.success(tradeRecord);
     }
 
+    /**
+    * @Description 取消订单 删除秒杀订单内容 将订单状态设为 2
+    *
+    * @param orderInfo 订单
+    * @return
+    *
+    **/
     @Override
     @Transactional(rollbackFor = Exception.class)
     public RestBean<?> cancelOrder(OrderInfo orderInfo) throws Exception {
@@ -123,10 +144,24 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         return RestBean.success("订单取消成功！");
     }
 
+    /**
+    * @Description 订单是否支付
+    *
+    * @param order 订单
+    * @return true 已支付
+    *
+    **/
     private boolean isOrderPayed(OrderInfo order) {
         return order.getStatus() == 1;
     }
 
+    /**
+    * @Description 订单是否已经取消
+    *
+    * @param order 订单
+    * @return true 已取消
+    *
+    **/
     private boolean isOrderCanceled(OrderInfo order) {
         return order.getStatus() == 2;
     }

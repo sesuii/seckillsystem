@@ -139,7 +139,14 @@ public class SeckillController {
         return RestBean.success("秒杀成功");
     }
 
-
+    /**
+    * @Description 获取秒杀结果
+    *        
+    * @param user 秒杀用户
+    * @param goodsId 商品id
+    * @return 订单号
+    *
+    **/
     @ApiOperation("获取秒杀结果")
     @GetMapping("getResult")
     public RestBean<?> getResult(User user, Long goodsId) {

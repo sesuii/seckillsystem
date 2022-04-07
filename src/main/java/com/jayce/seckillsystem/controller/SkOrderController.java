@@ -60,12 +60,22 @@ public class SkOrderController {
     public RestBean<?> orderCancel(@PathParam("orderId") Long orderId) throws Exception {
         OrderInfo orderInfo = orderInfoService.getById(orderId);
         if(null == orderInfo) return RestBean.failed(RestBeanEnum.ORDER_NOT_EXIST);
-        return orderInfoService.cancelOrder(orderInfo);
+        try {
+            return orderInfoService.cancelOrder(orderInfo);
+        }
+        catch (Exception e) {
+        }
+        return RestBean.failed(RestBeanEnum.FAILED);
     }
 
     @ApiOperation("用户支付订单")
     @GetMapping("/payFor")
-    public RestBean<?> payOrder(Long orderId) throws Exception {
-        return orderInfoService.payOrder(orderId);
+    public RestBean<?> payOrder(Long orderId) {
+        try {
+            return orderInfoService.payOrder(orderId);
+        }
+        catch (Exception e){
+        }
+        return RestBean.failed(RestBeanEnum.FAILED);
     }
 }
