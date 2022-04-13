@@ -1,11 +1,13 @@
 package com.jayce.seckillsystem.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jayce.seckillsystem.constant.RedisConstant;
 import com.jayce.seckillsystem.entity.Goods;
 import com.jayce.seckillsystem.entity.OrderInfo;
 import com.jayce.seckillsystem.entity.SkGoods;
 import com.jayce.seckillsystem.entity.SkOrder;
+import com.jayce.seckillsystem.rabbitmq.OrderInfoSender;
 import com.jayce.seckillsystem.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,6 +40,9 @@ public class SeckillServiceImpl implements SeckillService {
 
     @Resource
     private IOrderInfoService orderInfoService;
+
+    @Resource
+    private OrderInfoSender orderInfoSender;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -86,7 +91,7 @@ public class SeckillServiceImpl implements SeckillService {
      * @return 1 表示扣减库存成功，否则表示失败
      */
     private boolean reduceStock(Long goodsId) {
-        SkGoods skGoods = skGoodsService.getById(goodsId);
+        SkGoods skGoods = skGoodsService.getByGoodsId(goodsId);
         int newStock = skGoods.getStock() - 1;
         skGoods.setStock(newStock);
         // 更新数据库的库存
@@ -122,12 +127,13 @@ public class SeckillServiceImpl implements SeckillService {
                 .userId(userId)
                 .goodsId(goodsId)
                 .build();
-
         try {
             isSaveSkOrder = skOrderService.save(skOrder);
         } catch (Exception e) {
             throw e;
         }
+        // 发送消息到TTL队列
+        orderInfoSender.send(JSON.toJSONString(order));
         return isSaveSkOrder && isSaveOrderInfo;
     }
 

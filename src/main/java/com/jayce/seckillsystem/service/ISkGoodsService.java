@@ -24,4 +24,6 @@ public interface ISkGoodsService extends IService<SkGoods> {
      * @param skGoods 商品
      */
     int reduceStock(SkGoods skGoods);
+
+    SkGoods getByGoodsId(Long goodsId);
 }

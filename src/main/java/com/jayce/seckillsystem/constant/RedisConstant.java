@@ -41,6 +41,7 @@ public class RedisConstant {
      */
     public static final String PURCHASED_USER_PREFIX = "purchasedUser";
 
+
     /**
      * redis 分布式锁名
      */

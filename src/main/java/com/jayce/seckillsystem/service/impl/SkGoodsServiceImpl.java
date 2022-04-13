@@ -33,4 +33,9 @@ public class SkGoodsServiceImpl extends ServiceImpl<SkGoodsMapper, SkGoods> impl
 
         return skGoodsMapper.reduceStock(skGoods);
     }
+
+    @Override
+    public SkGoods getByGoodsId(Long goodsId) {
+        return skGoodsMapper.getByGoodsId(goodsId);
+    }
 }

@@ -22,7 +22,7 @@ public interface SkGoodsMapper extends BaseMapper<SkGoods> {
      * @param goodsId 商品ID
      * @return 商品库存
      */
-    @Select("select stock from sk_goods where id = #{goodsId} ")
+    @Select("select stock from sk_goods where goods_id = #{goodsId} ")
     int getStock(@Param("goodsId") Long goodsId);
 
     /**
@@ -33,4 +33,7 @@ public interface SkGoodsMapper extends BaseMapper<SkGoods> {
 //    @Update("update sk_goods set stock = stock - 1, version = version + 1 where id = #{id} and version = #{version}")
     @Update("update sk_goods set stock = stock - 1 where id = #{id} and stock > 0")
     int reduceStock(SkGoods skGoods);
+
+    @Select("select * from sk_goods where goods_id = #{goodsId}")
+    SkGoods getByGoodsId(@Param("goodsId") Long goodsId);
 }

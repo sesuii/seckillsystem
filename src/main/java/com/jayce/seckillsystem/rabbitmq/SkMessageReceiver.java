@@ -34,7 +34,6 @@ public class SkMessageReceiver {
     public void receive(String message) {
         // 转换成秒杀消息
         SkMessage skMessage = JSON.parseObject(message, SkMessage.class);
-
         // 秒杀商品（由于数据库设置了唯一索引，生成订单的时候，可能发生异常）
         try {
             seckillService.seckill(skMessage.getSkUser().getId(), skMessage.getGoodsId());

@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * @Description: 商品详情页——商品信息
- * @DATA: 2022/3/24 22:57
+ * @DATE: 2022/3/24 22:57
  * @Author: YoungSong
  * @File: seckillsystem GoodsVo
  * @Email: sjiahui27@gmail.com
@@ -47,6 +47,6 @@ public class GoodsVo extends Goods {
     /**
      * 是否需要预约 默认为0
      */
-    private Integer  subscribe;
+    private Byte subscribe;
 
 }
