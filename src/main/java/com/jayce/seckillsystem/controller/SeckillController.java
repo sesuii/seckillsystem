@@ -2,20 +2,17 @@ package com.jayce.seckillsystem.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.google.common.util.concurrent.RateLimiter;
 import com.jayce.seckillsystem.constant.RedisConstant;
-import com.jayce.seckillsystem.constant.RestBeanEnum;
+import com.jayce.seckillsystem.constant.ResultEnum;
 import com.jayce.seckillsystem.entity.GoodsStore;
 import com.jayce.seckillsystem.entity.SkMessage;
 import com.jayce.seckillsystem.entity.User;
-import com.jayce.seckillsystem.entity.resp.RestBean;
+import com.jayce.seckillsystem.entity.resp.Result;
 import com.jayce.seckillsystem.entity.vo.GoodsVo;
-import com.jayce.seckillsystem.entity.vo.UserVo;
 import com.jayce.seckillsystem.rabbitmq.SkMessageSender;
+import com.jayce.seckillsystem.service.IAccessRuleService;
 import com.jayce.seckillsystem.service.IGoodsService;
 import com.jayce.seckillsystem.service.ISkOrderService;
-import com.jayce.seckillsystem.service.IUserService;
-import com.jayce.seckillsystem.util.RedisLock;
 import com.jayce.seckillsystem.util.WebUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,10 +50,11 @@ public class SeckillController {
     @Resource
     private DefaultRedisScript<Long> redisScript;
 
-
     @Resource
     private ISkOrderService skOrderService;
 
+    @Resource
+    private IAccessRuleService accessRuleService;
 
 //    private RateLimiter rateLimiter = RateLimiter.create(200);
 
@@ -82,10 +80,10 @@ public class SeckillController {
 
     @ApiOperation("生成秒杀随机地址")
     @GetMapping(value = "/skPath")
-    public RestBean<?> getPath(User user, Long goodsId) {
-        if(user == null) return RestBean.failed(RestBeanEnum.AUTH_DENY);
+    public Result<?> getPath(User user, Long goodsId) {
+        if(user == null) return Result.failed(ResultEnum.AUTH_DENY);
         String skPath = skOrderService.createPath(user, goodsId);
-        return RestBean.success(skPath);
+        return Result.success(skPath);
     }
 
     /**
@@ -95,36 +93,36 @@ public class SeckillController {
      */
     @ApiOperation("秒杀操作")
     @PostMapping("/{skPath}/sekillgoods")
-    public RestBean<?> seckillGoods(@PathVariable String skPath, @RequestBody User user, Long goodsId) {
+    public Result<?> seckillGoods(@PathVariable String skPath, @RequestBody User user, Long goodsId) {
 //        // 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
 //        // 这里用了 synchronize 锁，所以效率会有所降低
 //        if (!rateLimiter.tryAcquire(2, TimeUnit.SECONDS)) {
 //            log.info("被限流了！");
 //            return RestBean.failed(RestBeanEnum.FAILED);
 //        }
-        // 验证秒杀地址是否有效
-        System.out.println(user);
-        System.out.println("hear1");
+
         boolean isLegalPath = skOrderService.checkPath(user, goodsId, skPath);
-        if(!isLegalPath) return RestBean.failed(RestBeanEnum.FAILED);
-        System.out.println("hear2");
+        if(!isLegalPath) return Result.failed(ResultEnum.FAILED);
+        // 判断用户是否有抢购资格
+        boolean hasAccessAuthority = accessRuleService.checkAccessAuthority(user, goodsId);
+        if(!hasAccessAuthority) return Result.failed(ResultEnum.WITHOUT_ACCESS_AUTHORITY);
         // 判断商品是否卖完了
         if (hasSoldOut(goodsId)) {
             log.info("{}号商品已经卖完", goodsId);
-            return RestBean.failed(RestBeanEnum.GET_GOODS_IS_OVER);
+            return Result.failed(ResultEnum.GET_GOODS_IS_OVER);
         }
 
         // 判断用户是否重复秒杀某一商品
         if (hasPurchased(user.getId(), goodsId)) {
             log.info("{}号顾客不能重复秒杀商品", user.getId());
-            return RestBean.failed(RestBeanEnum.GET_GOODS_IS_REUSE);
+            return Result.failed(ResultEnum.GET_GOODS_IS_REUSE);
         }
         // 判断商品是否还有库存
         if (!hasStock(goodsId)) {
             // 标记商品已经卖完了
             log.info("{}号商品已经卖完", goodsId);
             GoodsStore.goodsSoldOut.put(goodsId, true); // 内存标记
-            return RestBean.failed(RestBeanEnum.GET_GOODS_IS_OVER);
+            return Result.failed(ResultEnum.GET_GOODS_IS_OVER);
         }
         // 创建秒杀信息
         SkMessage skMessage = SkMessage.builder()
@@ -134,7 +132,7 @@ public class SeckillController {
 
 //         将秒杀消息放入消息队列
         skMessageSender.send(JSON.toJSONString(skMessage));
-        return RestBean.success("秒杀成功");
+        return Result.success("秒杀成功");
     }
 
     /**
@@ -147,12 +145,12 @@ public class SeckillController {
     **/
     @ApiOperation("获取秒杀结果")
     @GetMapping("getResult")
-    public RestBean<?> getResult(User user, Long goodsId) {
+    public Result<?> getResult(User user, Long goodsId) {
         if (user == null) {
-            return RestBean.failed(RestBeanEnum.AUTH_DENY);
+            return Result.failed(ResultEnum.AUTH_DENY);
         }
         Long orderId = skOrderService.getResult(user, goodsId);
-        return RestBean.success(orderId);
+        return Result.success(orderId);
     }
 
     /**

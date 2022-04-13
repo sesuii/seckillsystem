@@ -2,8 +2,7 @@ package com.jayce.seckillsystem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jayce.seckillsystem.entity.OrderInfo;
-import com.jayce.seckillsystem.entity.resp.RestBean;
-import com.jayce.seckillsystem.entity.vo.OrderInfoVo;
+import com.jayce.seckillsystem.entity.resp.Result;
 
 /**
  * <p>
@@ -22,7 +21,7 @@ public interface IOrderInfoService extends IService<OrderInfo> {
     * @return
     *
     **/
-    RestBean<?> detail(Long orderId);
+    Result<?> detail(Long orderId);
 
     /**
      * 支付订单 更新个人账户 更新银行账户 生成交易记录
@@ -30,7 +29,7 @@ public interface IOrderInfoService extends IService<OrderInfo> {
      * @return
      * @throws Exception
      */
-    RestBean<?> payOrder(Long orderId) throws Exception;
+    Result<?> payOrder(Long orderId) throws Exception;
 
     /**
     * @Description 取消订单
@@ -39,5 +38,5 @@ public interface IOrderInfoService extends IService<OrderInfo> {
     * @return
     *
     **/
-    RestBean<?> cancelOrder(OrderInfo orderInfo) throws Exception;
+    Result<?> cancelOrder(OrderInfo orderInfo) throws Exception;
 }

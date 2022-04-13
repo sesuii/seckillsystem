@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jayce.seckillsystem.dao.AccessRuleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jayce.seckillsystem.entity.AccessRule">
+        <id column="id" property="id" />
+        <result column="age_limit" property="ageLimit" />
+        <result column="workstatus_limit" property="workstatusLimit" />
+        <result column="over_count_limit" property="overCountLimit" />
+        <result column="over_total_amount" property="overTotalAmount" />
+        <result column="over_day" property="overDay" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, age_limit, workstatus_limit, over_count_limit, over_total_amount, over_day, update_time
+    </sql>
+
+</mapper>

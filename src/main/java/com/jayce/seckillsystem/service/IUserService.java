@@ -2,11 +2,8 @@ package com.jayce.seckillsystem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jayce.seckillsystem.entity.User;
-import com.jayce.seckillsystem.entity.resp.RestBean;
+import com.jayce.seckillsystem.entity.resp.Result;
 import com.jayce.seckillsystem.entity.vo.UserVo;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * <p>
@@ -18,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface IUserService extends IService<User> {
 
-    RestBean<?> createAccount(String username, String identityId, String mobilePhone, String password);
+    Result<?> createAccount(String username, String identityId, String mobilePhone, String password);
 
-    RestBean<?> doLogin(UserVo userVo);
+    Result<?> toLogin(UserVo userVo);
 }

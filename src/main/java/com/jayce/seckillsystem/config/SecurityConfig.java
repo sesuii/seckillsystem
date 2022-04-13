@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
@@ -14,6 +15,7 @@ import org.springframework.web.filter.CorsFilter;
 import javax.annotation.Resource;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
@@ -47,11 +49,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userDetailsService(authService)
                 .passwordEncoder(new BCryptPasswordEncoder());
     }
-    /*
+    /**
+    * @Description 跨域请求配置，放行所有
     *
-    * 跨域请求配置
+    * @param
+    * @return
     *
-    * */
+    **/
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();

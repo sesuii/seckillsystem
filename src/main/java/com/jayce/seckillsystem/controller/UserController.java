@@ -1,12 +1,10 @@
 package com.jayce.seckillsystem.controller;
 
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.jayce.seckillsystem.constant.RestBeanEnum;
 import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.UserFinancial;
-import com.jayce.seckillsystem.entity.resp.RestBean;
+import com.jayce.seckillsystem.entity.resp.Result;
 import com.jayce.seckillsystem.service.IUserFinancialService;
 import com.jayce.seckillsystem.service.IUserService;
 import io.swagger.annotations.Api;
@@ -47,7 +45,7 @@ public class UserController {
     * @Author YoungSong
     **/
     @GetMapping("/user-info")
-    public RestBean<?> info() {
+    public Result<?> info() {
         SecurityContext context = SecurityContextHolder.getContext();
         System.out.println(context.getAuthentication().getName());
         User user = userService.getOne(
@@ -55,13 +53,13 @@ public class UserController {
                         .eq(User::getMobilePhone, context.getAuthentication().getName())
         );
         user.setPwd(null);
-        return RestBean.success(user);
+        return Result.success(user);
     }
 
     @ApiOperation("用户账户信息接口")
     @GetMapping("/{userId}account")
-    public RestBean<?> getUserAccount(@PathParam("userId") Long userId) {
+    public Result<?> getUserAccount(@PathParam("userId") Long userId) {
         UserFinancial userFinancial = userFinancialService.getById(userId);
-        return RestBean.success(userFinancial);
+        return Result.success(userFinancial);
     }
 }

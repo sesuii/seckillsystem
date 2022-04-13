@@ -1,22 +1,23 @@
 package com.jayce.seckillsystem.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 秒杀商品
+ * <p>
+ * 秒杀产品表
+ * </p>
  *
- * @author <a href="mailto: su_1999@126.com">sujian</a>
+ * @author Gerry
+ * @since 2022-04-13
  */
 @Data
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class SkGoods implements Serializable {
 
@@ -49,6 +50,16 @@ public class SkGoods implements Serializable {
      *  秒杀结束时间
      */
     private Date endDateTime;
+
+    /**
+     *  准入规则id
+     */
+    private Long limitedRuleId;
+
+    /**
+     * 是否需要预约 默认为0
+     */
+    private Integer  subscribe;
 
 
 }

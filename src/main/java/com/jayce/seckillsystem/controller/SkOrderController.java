@@ -1,11 +1,10 @@
 package com.jayce.seckillsystem.controller;
 
 
-import com.jayce.seckillsystem.constant.RestBeanEnum;
+import com.jayce.seckillsystem.constant.ResultEnum;
 import com.jayce.seckillsystem.entity.OrderInfo;
 import com.jayce.seckillsystem.entity.User;
-import com.jayce.seckillsystem.entity.resp.RestBean;
-import com.jayce.seckillsystem.entity.vo.OrderInfoVo;
+import com.jayce.seckillsystem.entity.resp.Result;
 import com.jayce.seckillsystem.service.IOrderInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,49 +32,49 @@ public class SkOrderController {
 
     @ApiOperation("获取订单详细信息")
     @GetMapping("/detail")
-    public RestBean<?> detail(User user, Long orderId) {
+    public Result<?> detail(User user, Long orderId) {
         if (user == null) {
-            return RestBean.failed(RestBeanEnum.AUTH_DENY);
+            return Result.failed(ResultEnum.AUTH_DENY);
         }
         return orderInfoService.detail(orderId);
     }
 
     @ApiOperation("获取订单状态")
     @GetMapping("/getOrderStatus")
-    public RestBean<?> getOrderStatus(Long orderId) {
+    public Result<?> getOrderStatus(Long orderId) {
         OrderInfo orderInfo = orderInfoService.getById(orderId);
-        if(orderInfo == null) return RestBean.failed(RestBeanEnum.FAILED, "订单不存在");
+        if(orderInfo == null) return Result.failed(ResultEnum.FAILED, "订单不存在");
         if(orderInfo.getStatus() == 0) {
-            return RestBean.failed(RestBeanEnum.ORDER_NOT_PAY);
+            return Result.failed(ResultEnum.ORDER_NOT_PAY);
         }
         else if(orderInfo.getStatus() == 1)
-            return RestBean.success("订单已完成");
+            return Result.success("订单已完成");
         else if(orderInfo.getStatus() == 2)
-            return RestBean.failed(RestBeanEnum.ORDER_HAS_CANCEL);
+            return Result.failed(ResultEnum.ORDER_HAS_CANCEL);
         return null;
     }
 
     @ApiOperation("取消订单")
     @GetMapping("orderCancel{orderId}")
-    public RestBean<?> orderCancel(@PathParam("orderId") Long orderId) throws Exception {
+    public Result<?> orderCancel(@PathParam("orderId") Long orderId) throws Exception {
         OrderInfo orderInfo = orderInfoService.getById(orderId);
-        if(null == orderInfo) return RestBean.failed(RestBeanEnum.ORDER_NOT_EXIST);
+        if(null == orderInfo) return Result.failed(ResultEnum.ORDER_NOT_EXIST);
         try {
             return orderInfoService.cancelOrder(orderInfo);
         }
         catch (Exception e) {
         }
-        return RestBean.failed(RestBeanEnum.FAILED);
+        return Result.failed(ResultEnum.FAILED);
     }
 
     @ApiOperation("用户支付订单")
     @GetMapping("/payFor")
-    public RestBean<?> payOrder(Long orderId) {
+    public Result<?> payOrder(Long orderId) {
         try {
             return orderInfoService.payOrder(orderId);
         }
         catch (Exception e){
         }
-        return RestBean.failed(RestBeanEnum.FAILED);
+        return Result.failed(ResultEnum.FAILED);
     }
 }

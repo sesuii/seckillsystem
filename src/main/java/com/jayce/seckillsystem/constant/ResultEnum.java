@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public enum RestBeanEnum {
+public enum ResultEnum {
 
     // 通用状态码及信息
     SUCCESS(200, "SUCCESS"),
@@ -33,6 +33,7 @@ public enum RestBeanEnum {
     GET_GOODS_IS_OVER(5102, "秒杀商品已售罄"),
     GET_GOODS_IS_REUSE(5103, "不得对同一商品重复秒杀"),
     GET_GOODS_IS_NOT_START(5104, "秒杀尚未开始"),
+    WITHOUT_ACCESS_AUTHORITY(5105, "当前用户无购买资格"),
 
     // 生成订单时状态码及信息
     ADD_ORDER_ERROR(5201, "生成订单失败"),

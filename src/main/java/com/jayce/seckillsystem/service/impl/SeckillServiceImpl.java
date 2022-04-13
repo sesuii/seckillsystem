@@ -8,7 +8,6 @@ import com.jayce.seckillsystem.entity.SkGoods;
 import com.jayce.seckillsystem.entity.SkOrder;
 import com.jayce.seckillsystem.service.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,7 @@ public class SeckillServiceImpl implements SeckillService {
     private ISkOrderService skOrderService;
 
     @Resource
-    private SkGoodsService skGoodsService;
+    private ISkGoodsService skGoodsService;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;

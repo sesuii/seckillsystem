@@ -39,4 +39,14 @@ public class GoodsVo extends Goods {
      **/
     private Date endDateTime;
 
+    /**
+     *  准入规则id
+     */
+    private Long limitedRuleId;
+
+    /**
+     * 是否需要预约 默认为0
+     */
+    private Integer  subscribe;
+
 }

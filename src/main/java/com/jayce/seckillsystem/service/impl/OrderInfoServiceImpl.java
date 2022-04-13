@@ -2,10 +2,10 @@ package com.jayce.seckillsystem.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jayce.seckillsystem.constant.RestBeanEnum;
+import com.jayce.seckillsystem.constant.ResultEnum;
 import com.jayce.seckillsystem.entity.*;
 import com.jayce.seckillsystem.dao.OrderInfoMapper;
-import com.jayce.seckillsystem.entity.resp.RestBean;
+import com.jayce.seckillsystem.entity.resp.Result;
 import com.jayce.seckillsystem.entity.vo.GoodsVo;
 import com.jayce.seckillsystem.entity.vo.OrderInfoVo;
 import com.jayce.seckillsystem.service.*;
@@ -58,15 +58,15 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     *
     **/
     @Override
-    public RestBean<?> detail(Long orderId) {
+    public Result<?> detail(Long orderId) {
         OrderInfo order = orderInfoService.getById(orderId);
-        if(order == null) return RestBean.failed(RestBeanEnum.ORDER_NOT_EXIST);
+        if(order == null) return Result.failed(ResultEnum.ORDER_NOT_EXIST);
         GoodsVo goodsVo = goodsService.findGoodsVoById(order.getGoodsId());
         OrderInfoVo orderInfoVo = OrderInfoVo.builder()
                 .orderInfo(order)
                 .goodsVo(goodsVo)
                 .build();
-        return RestBean.success(orderInfoVo);
+        return Result.success(orderInfoVo);
     }
 
     /**
@@ -78,15 +78,15 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public RestBean<?> payOrder(Long orderId) throws Exception {
+    public Result<?> payOrder(Long orderId) throws Exception {
         OrderInfo order = orderInfoService.getById(orderId);
-        if(order == null) return RestBean.failed(RestBeanEnum.ORDER_NOT_EXIST);
+        if(order == null) return Result.failed(ResultEnum.ORDER_NOT_EXIST);
         BigDecimal pay = order.getGoodsPrice();
-        if(isOrderCanceled(order)) return RestBean.failed(RestBeanEnum.ORDER_HAS_CANCEL);
-        if(isOrderPayed(order)) return RestBean.success("订单已支付");
+        if(isOrderCanceled(order)) return Result.failed(ResultEnum.ORDER_HAS_CANCEL);
+        if(isOrderPayed(order)) return Result.success("订单已支付");
         // 更新个人账户
         UserFinancial userFinancial = userFinancialService.getById(order.getUserId());
-        if(userFinancial == null) return RestBean.failed(RestBeanEnum.ORDER_NOT_EXIST);
+        if(userFinancial == null) return Result.failed(ResultEnum.ORDER_NOT_EXIST);
         boolean isUpdateUser = userFinancialService.reduce(userFinancial, pay);
         if(!isUpdateUser) {
             log.info("用户账户余额不足");
@@ -121,7 +121,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             log.info("订单异常");
             throw new Exception("订单异常");
         }
-        return RestBean.success(tradeRecord);
+        return Result.success(tradeRecord);
     }
 
     /**
@@ -133,14 +133,14 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public RestBean<?> cancelOrder(OrderInfo orderInfo) throws Exception {
-        if(isOrderPayed(orderInfo)) return RestBean.failed(RestBeanEnum.FAILED, "订单已支付");
+    public Result<?> cancelOrder(OrderInfo orderInfo) throws Exception {
+        if(isOrderPayed(orderInfo)) return Result.failed(ResultEnum.FAILED, "订单已支付");
         boolean isCanceled = skOrderService.remove(new LambdaQueryWrapper<SkOrder>()
                 .eq(SkOrder::getOrderInfoId, orderInfo.getId())
         );
         if(orderInfoMapper.cancel(orderInfo) == 1) isCanceled = false;
         if(!isCanceled) throw new Exception("用户订单取消失败");
-        return RestBean.success("订单取消成功！");
+        return Result.success("订单取消成功！");
     }
 
     /**

@@ -1,20 +1,24 @@
 package com.jayce.seckillsystem.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jayce.seckillsystem.dao.SkGoodsMapper;
 import com.jayce.seckillsystem.entity.SkGoods;
-import com.jayce.seckillsystem.service.SkGoodsService;
+import com.jayce.seckillsystem.service.ISkGoodsService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
 /**
- * 商品管理
+ * <p>
+ * 秒杀产品表 服务实现类
+ * </p>
  *
- * @author <a href="mailto: su_1999@126.com">sujian</a>
+ * @author Gerry
+ * @since 2022-04-13
  */
 @Service
-public class SkGoodsServiceImpl extends ServiceImpl<SkGoodsMapper, SkGoods> implements SkGoodsService {
+public class SkGoodsServiceImpl extends ServiceImpl<SkGoodsMapper, SkGoods> implements ISkGoodsService {
 
     @Resource
     private SkGoodsMapper skGoodsMapper;
@@ -26,6 +30,7 @@ public class SkGoodsServiceImpl extends ServiceImpl<SkGoodsMapper, SkGoods> impl
 
     @Override
     public int reduceStock(SkGoods skGoods) {
+
         return skGoodsMapper.reduceStock(skGoods);
     }
 }

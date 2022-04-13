@@ -10,11 +10,13 @@
         <result column="stock" property="stock" />
         <result column="start_date_time" property="startDateTime" />
         <result column="end_date_time" property="endDateTime" />
+        <result column="limited_rule_id" property="limitedRuleId" />
+        <result column=" subscribe" property=" subscribe" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, goods_id, sk_price, stock, start_date_time, end_date_time
+        id, goods_id, sk_price, stock, start_date_time, end_date_time, limited_rule_id,  subscribe
     </sql>
 
 </mapper>

@@ -29,35 +29,30 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>2.6.4</version>
         </dependency>
-
         <!--MybatisPlus-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.5.1</version>
         </dependency>
-
         <!-- guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>31.0.1-jre</version>
         </dependency>
-
         <!-- redis -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>2.6.4</version>
         </dependency>
-
         <!-- druid -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.1.22</version>
         </dependency>
-
         <!-- mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>
@@ -65,7 +60,6 @@
             <version>8.0.28</version>
             <scope>runtime</scope>
         </dependency>
-
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -73,7 +67,6 @@
             <version>1.18.22</version>
             <optional>true</optional>
         </dependency>
-
         <!-- fastjson -->
         <dependency>
             <groupId>com.alibaba</groupId>
