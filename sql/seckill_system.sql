@@ -11,31 +11,11 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 14/04/2022 11:26:44
+ Date: 07/04/2022 16:47:33
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
-
--- ----------------------------
--- Table structure for access_rule
--- ----------------------------
-DROP TABLE IF EXISTS `access_rule`;
-CREATE TABLE `access_rule`  (
-  `id` bigint NOT NULL COMMENT ' 主键',
-  `age_limit` int NOT NULL DEFAULT -1 COMMENT ' 年龄限制 默认为-1无限制',
-  `workstatus_limit` int NOT NULL DEFAULT -1 COMMENT '工作状态限制 默认-1无限制 1为工作稳定',
-  `over_count_limit` int NOT NULL DEFAULT -1 COMMENT ' 逾期次数限制默认-1无限制',
-  `over_total_amount` decimal(10, 2) NOT NULL DEFAULT -1.00 COMMENT '逾期总金额限制 默认-1无限制',
-  `over_day` int NOT NULL DEFAULT -1 COMMENT '逾期天数限制',
-  `update_time` datetime NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT ' 创建时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '准入规则表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of access_rule
--- ----------------------------
-INSERT INTO `access_rule` VALUES (0, 18, 1, 1, 1.00, 1, '2022-04-13 18:01:31');
 
 -- ----------------------------
 -- Table structure for bank_account
@@ -46,7 +26,7 @@ CREATE TABLE `bank_account`  (
   `account_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '银行账户名',
   `account_balance` decimal(10, 2) NULL DEFAULT NULL COMMENT '账户余额',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '银行账户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of bank_account
@@ -67,12 +47,13 @@ CREATE TABLE `goods`  (
   `create_time` datetime NULL DEFAULT NULL COMMENT ' 创建时间',
   `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '逻辑删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '银行产品表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
 INSERT INTO `goods` VALUES (1, '香蕉', 'photo', 100.00, 121, '一种水果', '2022-03-15 10:23:27', 0);
+INSERT INTO `goods` VALUES (2, '苹果', 'photo', 100.00, 121, '一种水果', '2022-03-25 14:45:34', 0);
 
 -- ----------------------------
 -- Table structure for order_info
@@ -91,11 +72,14 @@ CREATE TABLE `order_info`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id` ASC) USING BTREE,
   CONSTRAINT `order_info_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '订单详情表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of order_info
 -- ----------------------------
+INSERT INTO `order_info` VALUES (14, 2, 1, '香蕉', 1, 100.00, 1, '2022-04-04 23:03:17', '2022-04-07 01:04:27');
+INSERT INTO `order_info` VALUES (15, 17, 1, '香蕉', 1, 100.00, 0, '2022-04-06 14:00:22', NULL);
+INSERT INTO `order_info` VALUES (17, 2, 1, '香蕉', 1, 100.00, 1, '2022-04-07 16:43:26', '2022-04-07 16:45:05');
 
 -- ----------------------------
 -- Table structure for sk_goods
@@ -108,19 +92,14 @@ CREATE TABLE `sk_goods`  (
   `stock` int NULL DEFAULT NULL COMMENT '秒杀数量',
   `start_date_time` datetime NULL DEFAULT NULL COMMENT '秒杀开始时间',
   `end_date_time` datetime NULL DEFAULT NULL COMMENT ' 秒杀结束时间',
-  `limited_rule_id` bigint NULL DEFAULT NULL COMMENT ' 准入规则id',
-  `subscribe` tinyint(3) UNSIGNED ZEROFILL NOT NULL COMMENT '是否需要预约 默认为0',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `goods_id`(`goods_id` ASC) USING BTREE,
-  INDEX `limited_rule_id`(`limited_rule_id` ASC) USING BTREE,
-  CONSTRAINT `sk_goods_ibfk_1` FOREIGN KEY (`goods_id`) REFERENCES `goods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `sk_goods_ibfk_2` FOREIGN KEY (`limited_rule_id`) REFERENCES `access_rule` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀产品表' ROW_FORMAT = DYNAMIC;
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sk_goods
 -- ----------------------------
-INSERT INTO `sk_goods` VALUES (3, 1, 10.00, 1, '2022-04-13 00:14:48', '2022-04-15 00:14:54', 0, 001);
+INSERT INTO `sk_goods` VALUES (1, 1, 10.00, 95, '2022-03-25 13:29:00', '2022-03-26 13:29:05');
+INSERT INTO `sk_goods` VALUES (2, 2, 0.00, 122, '2022-03-25 14:46:26', '2022-03-26 14:46:38');
 
 -- ----------------------------
 -- Table structure for sk_order
@@ -133,13 +112,12 @@ CREATE TABLE `sk_order`  (
   `goods_id` bigint NOT NULL COMMENT '商品ID',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_userId_goodsId`(`user_id` ASC, `goods_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀订单表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sk_order
 -- ----------------------------
-INSERT INTO `sk_order` VALUES (16, 26, 16, 1);
-INSERT INTO `sk_order` VALUES (17, 27, 2, 1);
+INSERT INTO `sk_order` VALUES (7, 17, 2, 1);
 
 -- ----------------------------
 -- Table structure for sk_user
@@ -151,7 +129,7 @@ CREATE TABLE `sk_user`  (
   `mobile_phone` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT ' 用户手机号',
   `pwd` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户密码',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀用户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sk_user
@@ -170,11 +148,13 @@ CREATE TABLE `trade_record`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `order_id`(`order_id` ASC) USING BTREE,
   CONSTRAINT `trade_record_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `order_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '交易记录表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of trade_record
 -- ----------------------------
+INSERT INTO `trade_record` VALUES (1, 14, 2, 1, '2022-04-07 01:04:27');
+INSERT INTO `trade_record` VALUES (2, 17, 2, 1, '2022-04-07 16:45:05');
 
 -- ----------------------------
 -- Table structure for user
@@ -192,7 +172,7 @@ CREATE TABLE `user`  (
   `deleted` tinyint(1) UNSIGNED ZEROFILL NOT NULL DEFAULT 0 COMMENT '逻辑删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `unique_identity`(`identity_id` ASC, `mobile_phone` ASC) USING BTREE COMMENT '身份证号码和手机号唯一'
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
@@ -216,7 +196,7 @@ CREATE TABLE `user_financial`  (
   `over_amount` decimal(10, 2) UNSIGNED ZEROFILL NOT NULL COMMENT '逾期金额',
   PRIMARY KEY (`id`) USING BTREE,
   CONSTRAINT `user_financial_ibfk_1` FOREIGN KEY (`id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户资产表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_financial
