@@ -2,6 +2,7 @@ package com.jayce.seckillsystem.controller;
 
 
 import com.jayce.seckillsystem.constant.ResultEnum;
+import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.resp.Result;
 import com.jayce.seckillsystem.entity.vo.UserVo;
 import com.jayce.seckillsystem.service.IUserService;
@@ -30,8 +31,8 @@ public class AuthController {
 
     @ApiOperation("用户登录")
     @PostMapping(value = "/toLogin")
-    public Result<?> toLogin(@RequestBody UserVo userVo) {
-        return userService.toLogin(userVo);
+    public Result<?> toLogin(@RequestBody User user) {
+        return userService.toLogin(user);
     }
 
     @ApiOperation("退出登录")

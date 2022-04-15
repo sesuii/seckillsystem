@@ -2,7 +2,10 @@
 
 ## 1. 用户登录
 
-通过 cookie + redis 的方式实现分布式 session 存储
+通过spring-security整合jwt实现无状态登录，用户登录成功后会返回一个token，访问认证接口需要在请求头中携带token。
+可用以下token进行测试
+token
+`eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxODA4Njg3MTk5MiIsImlhdCI6MTY1MDAyMzM3NCwianRpIjoiYzM0YjNhNTAtMTdjOC00YzJjLWI4MDEtOTk4ZGM3OWUwNTkzIiwidG9rZW4iOiIxODA4Njg3MTk5MiJ9.eU3IblAQ0Njec1dhg4IyVZg_ivd-lUlKezSNEnayGEc`
 
 ## 2. 缓存预热
 

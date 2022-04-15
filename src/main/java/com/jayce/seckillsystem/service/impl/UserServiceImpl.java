@@ -10,14 +10,19 @@ import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.resp.Result;
 import com.jayce.seckillsystem.entity.vo.UserVo;
 import com.jayce.seckillsystem.service.IUserService;
+import com.jayce.seckillsystem.util.JwtUtil;
 import com.jayce.seckillsystem.util.WebUtil;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,6 +42,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     RedisTemplate<String, Object> redisTemplate;
 
+    @Resource
+    AuthenticationManager authenticationManager;
+
     /**
     * @Description 创建用户 用户注册
     *
@@ -48,7 +56,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Result<?> createAccount(String username, String identityId, String mobilePhone, String password) {
         User user = getOne(new LambdaQueryWrapper<User>()
-                .eq(User::getIdentityId, identityId)
+                .eq(User::getMobilePhone, mobilePhone)
         );
         if(user != null) return Result.failed(ResultEnum.SAVE_USER_REUSE);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -64,23 +72,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return Result.success(user);
     }
 
+
     @Override
-    public Result<?> toLogin(UserVo userVo) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String mobilePhone = userVo.getMobile();
-        String password = userVo.getPassword();
-        User user = getOne(new LambdaQueryWrapper<User>()
-                .eq(User::getMobilePhone, mobilePhone)
-        );
-        if(user == null) {
-            return Result.failed(ResultEnum.GET_USER_NOT_FOUND);
-        }
-        if(!encoder.matches(password, user.getPwd())) {
-            return Result.failed(ResultEnum.USER_PASSWORD_ERROR);
-        }
-        saveSession(mobilePhone, user);
-        user.setPwd(null);
-        return Result.success(user);
+    public Result<?> toLogin(User user) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(user.getMobilePhone(), user.getPwd());
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        UserVo userVo = (UserVo) authentication.getPrincipal();
+        redisTemplate.opsForValue().set(RedisConstant.USER_NAME_PREFIX + userVo.getUsername(),
+                JSON.toJSONString(userVo), RedisConstant.SESSION_EXPIRE_TIME, TimeUnit.SECONDS);
+        String jwt = JwtUtil.createJWT(user.getMobilePhone());
+        return Result.success(Map.of("token", jwt));
     }
 
     /**

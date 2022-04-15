@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.UserFinancial;
 import com.jayce.seckillsystem.entity.resp.Result;
+import com.jayce.seckillsystem.entity.vo.UserVo;
 import com.jayce.seckillsystem.service.IUserFinancialService;
 import com.jayce.seckillsystem.service.IUserService;
 import io.swagger.annotations.Api;
@@ -47,13 +48,12 @@ public class UserController {
     @GetMapping("/user-info")
     public Result<?> info() {
         SecurityContext context = SecurityContextHolder.getContext();
-        System.out.println(context.getAuthentication().getName());
+        System.out.println("mo" + context.getAuthentication().getName());
         User user = userService.getOne(
                 new LambdaQueryWrapper<User>()
                         .eq(User::getMobilePhone, context.getAuthentication().getName())
         );
-        user.setPwd(null);
-        return Result.success(user);
+        return Result.success(new UserVo(user));
     }
 
     @ApiOperation("用户账户信息接口")

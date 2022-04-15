@@ -17,5 +17,6 @@ public interface IUserService extends IService<User> {
 
     Result<?> createAccount(String username, String identityId, String mobilePhone, String password);
 
-    Result<?> toLogin(UserVo userVo);
+
+    Result<?> toLogin(User user);
 }
