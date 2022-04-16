@@ -3,7 +3,6 @@ package com.jayce.seckillsystem.filter;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.jayce.seckillsystem.constant.RedisConstant;
-import com.jayce.seckillsystem.entity.SkMessage;
 import com.jayce.seckillsystem.entity.vo.UserVo;
 import com.jayce.seckillsystem.util.JwtUtil;
 import io.jsonwebtoken.Claims;

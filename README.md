@@ -3,9 +3,6 @@
 ## 1. 用户登录
 
 通过spring-security整合jwt实现无状态登录，用户登录成功后会返回一个token，访问认证接口需要在请求头中携带token。
-可用以下token进行测试
-token
-`eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxODA4Njg3MTk5MiIsImlhdCI6MTY1MDAyMzM3NCwianRpIjoiYzM0YjNhNTAtMTdjOC00YzJjLWI4MDEtOTk4ZGM3OWUwNTkzIiwidG9rZW4iOiIxODA4Njg3MTk5MiJ9.eU3IblAQ0Njec1dhg4IyVZg_ivd-lUlKezSNEnayGEc`
 
 ## 2. 缓存预热
 
@@ -35,7 +32,7 @@ token
 
 > 优化内容：数据库中查询商品库存 -> redis 中预减库存
 
-### 3.5 将秒杀信息放入消息队列中
+### 3.5 将秒杀信息放入Rabbitmq消息队列中
 
 通过消息队列实现异步下单与流量削峰。
 
@@ -54,6 +51,10 @@ token
 ### 3.7 秒杀失败
 
 在 3.6 中任一过程出问题时，数据将会回滚，redis 中预减的库存会加回来。
+
+### 3.8 隐藏秒杀地址
+
+用户请求秒杀接口时，会先根据用户消息和产品ID生成一个随机地址，真正的秒杀接口被隐藏
 
 ## 4. 系统测试
 

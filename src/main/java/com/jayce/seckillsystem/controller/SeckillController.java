@@ -111,7 +111,6 @@ public class SeckillController {
             log.info("{}号商品已经卖完", goodsId);
             return Result.failed(ResultEnum.GET_GOODS_IS_OVER);
         }
-
         // 判断用户是否重复秒杀某一商品
         if (hasPurchased(user.getId(), goodsId)) {
             log.info("{}号顾客不能重复秒杀商品", user.getId());

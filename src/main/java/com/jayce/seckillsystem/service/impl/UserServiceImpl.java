@@ -74,7 +74,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 
     @Override
-    public Result<?> toLogin(User user) {
+    public Result<?>    toLogin(User user) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(user.getMobilePhone(), user.getPwd());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);

@@ -32,6 +32,7 @@ public class JwtUtil {
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(now)
                 .setSubject(subject)
+                .setExpiration(new Date(nowMillis + 3600 * 30))
                 .signWith(SignatureAlgorithm.HS256, "123456");
 //        if (ttlMillis >= 0) {
 //            long expMillis = nowMillis + ttlMillis;
