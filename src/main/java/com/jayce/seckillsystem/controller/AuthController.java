@@ -4,7 +4,6 @@ package com.jayce.seckillsystem.controller;
 import com.jayce.seckillsystem.constant.ResultEnum;
 import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.resp.Result;
-import com.jayce.seckillsystem.entity.vo.UserVo;
 import com.jayce.seckillsystem.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

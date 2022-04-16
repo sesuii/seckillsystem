@@ -3,7 +3,6 @@ package com.jayce.seckillsystem.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.resp.Result;
-import com.jayce.seckillsystem.entity.vo.UserVo;
 
 /**
  * <p>

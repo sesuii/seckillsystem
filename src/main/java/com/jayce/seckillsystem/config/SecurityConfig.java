@@ -1,7 +1,6 @@
 package com.jayce.seckillsystem.config;
 
 import com.jayce.seckillsystem.filter.AuthenticationFilter;
-import com.jayce.seckillsystem.service.impl.AuthServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
