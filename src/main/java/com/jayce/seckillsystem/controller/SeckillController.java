@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto: su_1999@126.com">sujian</a>
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/sk")
 @Api(tags = "秒杀商品接口", value = "完成商品秒杀核心部分")
 @Slf4j
 public class SeckillController {
