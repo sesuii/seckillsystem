@@ -7,9 +7,9 @@ package com.jayce.seckillsystem.constant;
  */
 public class RedisConstant {
     /**
-     * cookie 名
+     * Token 存活时间
      */
-    public static final String COOKIE_NAME = "user_mobile";
+    public static final int TOKEN_EXPIRE_TIME = 1000 * 3600 * 6;
 
     /**
      * 某商品的秒杀时间（单位：秒）
@@ -17,17 +17,12 @@ public class RedisConstant {
     public static final int GOODS_EXPIRE_TIME = 60 * 5;
 
     /**
-     * session 保存在 redis 有效时间（单位：秒）
-     */
-    public static final int SESSION_EXPIRE_TIME = 3600 * 24 * 2;
-
-    /**
      * 商品信息存储在 redis 中，以该字符串为前缀
      */
     public static final String GOODS_PREFIX = "goods:";
 
     /**
-     * 用户ID为 key 存储在 redis 中，以该字符串为前缀
+     * 用户 ID 为 key 存储在 redis 中，以该字符串为前缀
      */
     public static final String USER_ID_PREFIX = "userId:";
 

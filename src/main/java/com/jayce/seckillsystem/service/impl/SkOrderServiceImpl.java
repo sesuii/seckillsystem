@@ -29,26 +29,27 @@ public class SkOrderServiceImpl extends ServiceImpl<SkOrderMapper, SkOrder> impl
     private RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public String createPath(User user, Long goodsId) {
+    public String createPath(Long userId, Long goodsId) {
         String str = UUID.randomUUID().toString().replace("-", "");
-        redisTemplate.opsForValue().set("seckillPath:" + user.getId() + ":" + goodsId, str, 3, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("seckillPath:" + userId + ":" + goodsId, str, 3, TimeUnit.MINUTES);
         return str;
     }
 
     @Override
-    public boolean checkPath(User user, Long goodsId, String path) {
-        if (user == null || goodsId < 0 || StringUtils.isEmpty(path)) {
+    public boolean checkPath(Long userId, Long goodsId, String path) {
+        if (goodsId < 0 || StringUtils.isEmpty(path)) {
             return false;
         }
-        String redisPath = (String) redisTemplate.opsForValue().get("seckillPath:" + user.getId() + ":" + goodsId);
+        String redisPath = (String) redisTemplate.opsForValue().get("seckillPath:" + userId + ":" + goodsId);
+        System.out.println(redisPath);
         return path.equals(redisPath);
     }
 
     @Override
-    public Long getResult(User user, Long goodsId) {
+    public Long getResult(Long userId, Long goodsId) {
         SkOrder skOrder = skOrderService.getOne(
                 new LambdaQueryWrapper<SkOrder>()
-                        .eq(SkOrder::getUserId, user.getId())
+                        .eq(SkOrder::getUserId, userId)
                         .eq(SkOrder::getGoodsId, goodsId)
         );
         if (null != skOrder) {

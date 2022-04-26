@@ -25,8 +25,4 @@ public class WebUtil {
                 = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         return requestAttributes.getResponse();
     }
-
-    public static HttpSession getSession() {
-        return getRequest().getSession();
-    }
 }

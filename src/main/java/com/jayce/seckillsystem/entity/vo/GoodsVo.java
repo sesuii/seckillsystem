@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * @Description: 商品详情页——商品信息
  * @DATE: 2022/3/24 22:57
- * @Author: YoungSong
+ * @Author: Gerry
  * @File: seckillsystem GoodsVo
  * @Email: sjiahui27@gmail.com
  **/

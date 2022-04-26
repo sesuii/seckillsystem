@@ -15,9 +15,9 @@ import org.springframework.stereotype.Service;
  */
 public interface ISkOrderService extends IService<SkOrder> {
 
-    String createPath(User user, Long goodsId);
+    String createPath(Long userId, Long goodsId);
 
-    boolean checkPath(User user, Long goodsId, String path);
+    boolean checkPath(Long userId, Long goodsId, String path);
 
-    Long getResult(User user, Long goodsId);
+    Long getResult(Long userId, Long goodsId);
 }

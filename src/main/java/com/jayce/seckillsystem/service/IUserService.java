@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jayce.seckillsystem.entity.User;
 import com.jayce.seckillsystem.entity.resp.Result;
 
+import java.util.Map;
+
 /**
  * <p>
  *  服务类
@@ -14,8 +16,7 @@ import com.jayce.seckillsystem.entity.resp.Result;
  */
 public interface IUserService extends IService<User> {
 
-    Result<?> createAccount(String username, String identityId, String mobilePhone, String password);
+    User createAccount(String username, String identityId, String mobilePhone, String password);
 
-
-    Result<?> toLogin(User user);
+    Map<String, String> toLogin(User user);
 }

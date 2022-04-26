@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 @Api(tags = "用户认证接口", value = "包括用户登录、注册操作")
 @RestController
@@ -25,13 +26,16 @@ public class AuthController {
                               String identityId,
                               String mobilePhone,
                               String password) {
-        return  userService.createAccount(username, identityId, mobilePhone, password);
+        User user = userService.createAccount(username, identityId, mobilePhone, password);
+        if(user == null) return Result.failed(ResultEnum.SAVE_USER_REUSE);
+        return  Result.success(user);
     }
 
     @ApiOperation("用户登录")
-    @PostMapping(value = "/toLogin")
+    @PostMapping(value = "/to-login")
     public Result<?> toLogin(@RequestBody User user) {
-        return userService.toLogin(user);
+        Map<String, String> token = userService.toLogin(user);
+        return Result.success(token);
     }
 
     @ApiOperation("退出登录")
@@ -41,7 +45,7 @@ public class AuthController {
     }
 
     @ApiOperation("未登录拒绝访问")
-    @RequestMapping("/access-deny")
+    @PostMapping("/access-deny")
     public Result<?> accessDeny() {
         return Result.failed(ResultEnum.AUTH_DENY);
     }

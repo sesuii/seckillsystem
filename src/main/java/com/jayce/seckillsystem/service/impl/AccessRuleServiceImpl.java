@@ -36,7 +36,6 @@ public class AccessRuleServiceImpl extends ServiceImpl<AccessRuleMapper, AccessR
     /**
     * @Description 判断用户是否有购买产品的资格
     *        根据准入规则的年龄，逾期次数和逾期金额限制
-    * TODO 准入规则相关状态值需创建枚举/常量
     * @param user 用户
     * @param goodsId 产品ID
     * @return
@@ -50,13 +49,13 @@ public class AccessRuleServiceImpl extends ServiceImpl<AccessRuleMapper, AccessR
         if(limitedId != 0L) {
             AccessRule accessRule = accessRuleService.getById(limitedId);
             if(userFinancial.getIntegrityDegree() < 0) return false;
-            // 无工作
+            // 用户无工作
             if(accessRule.getWorkstatusLimit() == 0) return false;
             if(!accessRule.getOverTotalAmount().equals(-1) ||
                     userFinancial.getOverAmount().compareTo(accessRule.getOverTotalAmount()) > 0)
                 return false;
-            if(accessRule.getAgeLimit() != -1 ||
-                    getUserAge(user.getIdentityId()) < accessRule.getAgeLimit()) return false;
+            return accessRule.getAgeLimit() == -1 &&
+                    getUserAge(user.getIdentityId()) >= accessRule.getAgeLimit();
         }
         return true;
     }

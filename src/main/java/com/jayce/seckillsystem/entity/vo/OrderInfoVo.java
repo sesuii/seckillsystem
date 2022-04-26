@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * @Description: 订单详情类
  * @DATE: 2022/4/4 23:13
- * @Author: YoungSong
+ * @Author: Gerry
  * @File: seckillsystem OrderInfoVo
  * @Email: sjiahui27@gmail.com
  **/

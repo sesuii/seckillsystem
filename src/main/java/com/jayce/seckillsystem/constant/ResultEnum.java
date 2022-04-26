@@ -26,7 +26,7 @@ public enum ResultEnum {
     USER_PASSWORD_ERROR(5002, "用户密码错误"),
     SAVE_USER_REUSE(5003, "用户已存在"),
     SAVE_USER_ERROR(5004, "注册用户失败"),
-    AUTH_DENY(401, "用户权限不足 请先登录再操作"),
+    AUTH_DENY(5005, "用户权限不足 请先登录再操作"),
 
     // 商品秒杀时状态码及信息
     GET_GOODS_NOT_FOUND(5101, "尚无秒杀商品"),

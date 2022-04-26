@@ -14,6 +14,13 @@ import org.apache.ibatis.annotations.Update;
  */
 public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
 
+    /**
+    * @Description 取消订单
+    *
+    * @param orderInfo 订单详情
+    * @return 操作是否成功，1 为成功
+    *
+    **/
     @Update("update order_info set status = 2 where id = #{id} and status != 1")
-    int cancel(OrderInfo orderInfo);
+    int cancelOrder(OrderInfo orderInfo);
 }

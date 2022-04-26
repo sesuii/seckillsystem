@@ -33,6 +33,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     @Resource
     RedisTemplate<String, Object> redisTemplate;
 
+    /**
+    * @Description 用户身份验证过滤器，最前端的认证授权拦截
+    * 如果请求头未携带 Token 则放行（给后面拦截。如果携带 Token，检验是否正确
+    * @param request
+    * @param response
+    * @param filterChain
+    * @return
+    *
+    **/
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("token");

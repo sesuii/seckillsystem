@@ -2,6 +2,8 @@ package com.jayce.seckillsystem.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jayce.seckillsystem.constant.OrderStatusConstant;
+import com.jayce.seckillsystem.constant.RedisConstant;
 import com.jayce.seckillsystem.constant.ResultEnum;
 import com.jayce.seckillsystem.entity.*;
 import com.jayce.seckillsystem.dao.OrderInfoMapper;
@@ -10,19 +12,21 @@ import com.jayce.seckillsystem.entity.vo.GoodsVo;
 import com.jayce.seckillsystem.entity.vo.OrderInfoVo;
 import com.jayce.seckillsystem.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * <p>
  *  服务实现类
  * </p>
  *
- * @author YoungSong
+ * @author Gerry
  * @since 2022-03-23
  */
 @Slf4j
@@ -50,6 +54,11 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Resource
     ITradeRecordService tradeRecordService;
 
+    @Resource
+    ISkGoodsService skGoodsService;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
     /**
     * @Description 获取订单详情信息
     *
@@ -58,15 +67,14 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     *
     **/
     @Override
-    public Result<?> detail(Long orderId) {
+    public OrderInfoVo toDetail(Long orderId) {
         OrderInfo order = orderInfoService.getById(orderId);
-        if(order == null) return Result.failed(ResultEnum.ORDER_NOT_EXIST);
+        if(order == null) return null;
         GoodsVo goodsVo = goodsService.findGoodsVoById(order.getGoodsId());
-        OrderInfoVo orderInfoVo = OrderInfoVo.builder()
+        return OrderInfoVo.builder()
                 .orderInfo(order)
                 .goodsVo(goodsVo)
                 .build();
-        return Result.success(orderInfoVo);
     }
 
     /**
@@ -125,7 +133,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     }
 
     /**
-    * @Description 取消订单 删除秒杀订单内容 将订单状态设为 2
+    * @Description 取消订单 删除秒杀订单内容 将订单状态设为 取消状态
     *
     * @param orderInfo 订单
     * @return
@@ -133,14 +141,47 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     **/
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result<?> cancelOrder(OrderInfo orderInfo) throws Exception {
-        if(isOrderPayed(orderInfo)) return Result.failed(ResultEnum.FAILED, "订单已支付");
+    public boolean cancelOrder(OrderInfo orderInfo) throws Exception {
+        if(isOrderPayed(orderInfo)) return true;
         boolean isCanceled = skOrderService.remove(new LambdaQueryWrapper<SkOrder>()
                 .eq(SkOrder::getOrderInfoId, orderInfo.getId())
         );
-        if(orderInfoMapper.cancel(orderInfo) == 1) isCanceled = false;
-        if(!isCanceled) throw new Exception("用户订单取消失败");
-        return Result.success("订单取消成功！");
+        if(orderInfoMapper.cancelOrder(orderInfo) == 0) isCanceled = false;
+        if(isCanceled) {
+            rollbackStock(orderInfo.getGoodsId());
+            rollbackRedisStock(orderInfo.getGoodsId());
+        }
+        return isCanceled;
+    }
+
+    /**
+    * @Description 回滚 Redis 预减库存
+    *
+    * @param goodsId 商品 ID
+    * @return
+    *
+    **/
+    public void rollbackRedisStock(Long goodsId) {
+        Long increment = redisTemplate.opsForValue().increment(RedisConstant.GOODS_PREFIX + goodsId);
+        if (increment != null && increment > 0) {
+            GoodsStore.goodsSoldOut.put(goodsId, false);
+        }
+    }
+
+
+    /**
+     * @Description 回滚数据库库存
+     *
+     * @param goodsId 商品 ID
+     * @return
+     *
+     **/
+    public boolean rollbackStock(Long goodsId) {
+        SkGoods skGoods = skGoodsService.getByGoodsId(goodsId);
+        int newStock = skGoods.getStock() + 1;
+        skGoods.setStock(newStock);
+        int update = skGoodsService.rollbackStock(skGoods);
+        return update == 1;
     }
 
     /**
@@ -151,7 +192,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     *
     **/
     private boolean isOrderPayed(OrderInfo order) {
-        return order.getStatus() == 1;
+        return order.getStatus() == OrderStatusConstant.ORDER_HAS_PAID;
     }
 
     /**
@@ -162,6 +203,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     *
     **/
     private boolean isOrderCanceled(OrderInfo order) {
-        return order.getStatus() == 2;
+        return order.getStatus() == OrderStatusConstant.ORDER_HAS_CANCELED;
     }
+
 }

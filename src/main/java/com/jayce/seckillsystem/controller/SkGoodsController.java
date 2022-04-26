@@ -31,14 +31,12 @@ public class SkGoodsController {
     @Resource
     IGoodsService goodsService;
 
-
     @ApiOperation("获取商品列表")
     @GetMapping("")
     public Result<?> skGoodsCategory() {
         List<GoodsVo> goodsList = goodsService.getGoodsList();
         return Result.success(goodsList);
     }
-
 
     @ApiOperation("获取商品详情信息")
     @GetMapping("/detail/goodsId={goodsId}")

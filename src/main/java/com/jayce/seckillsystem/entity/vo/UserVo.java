@@ -15,7 +15,7 @@ import java.util.Collection;
 /**
  * @Description: 用户导入类
  * @DATE: 2022/3/24 22:34
- * @Author: YoungSong
+ * @Author: Gerry
  * @File: seckillsystem UserVo
  * @Email: sjiahui27@gmail.com
  **/

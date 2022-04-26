@@ -99,6 +99,7 @@ public class SeckillServiceImpl implements SeckillService {
         return update == 1;
     }
 
+
     /**
      * 添加订单
      *
@@ -132,7 +133,7 @@ public class SeckillServiceImpl implements SeckillService {
         } catch (Exception e) {
             throw e;
         }
-        // 发送消息到TTL队列
+        // 发送消息到 TTL 队列
         orderInfoSender.send(JSON.toJSONString(order));
         return isSaveSkOrder && isSaveOrderInfo;
     }

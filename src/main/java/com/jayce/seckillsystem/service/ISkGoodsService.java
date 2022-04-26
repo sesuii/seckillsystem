@@ -10,20 +10,11 @@ import com.jayce.seckillsystem.entity.SkGoods;
  */
 public interface ISkGoodsService extends IService<SkGoods> {
 
-    /**
-     * 获取某商品的库存
-     *
-     * @param goodsId 商品ID
-     * @return 商品库存
-     */
     int getStock(Long goodsId);
 
-    /**
-     * 扣减商品库存
-     *
-     * @param skGoods 商品
-     */
     int reduceStock(SkGoods skGoods);
 
     SkGoods getByGoodsId(Long goodsId);
+
+    int rollbackStock(SkGoods skGoods);
 }

@@ -70,7 +70,6 @@ public class SeckillController {
 //            log.info("用户未登录！");
 //            return "login";
 //        }
-        
         // 使用随机字数字模拟 userId
         int userId = new Random().nextInt(2000);
     }

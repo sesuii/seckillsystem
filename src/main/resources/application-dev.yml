@@ -4,15 +4,15 @@ spring:
   application:
     name: seckillsystem
   redis:
-    host: xxxxxxx
+    host: 1.116.208.200
     port: 6379
     password: 123456
   rabbitmq:
-    host: xxxxxxx
+    host: 1.116.208.200
     virtual-host: /
     port: 5672
-    username: test
-    password: test
+    username: admin
+    password: admin
     template:
       retry:
         enabled: true
@@ -27,12 +27,12 @@ spring:
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://xxxxxxx:3306/seckill_system?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+    url: jdbc:mysql://1.116.208.200:3306/seckill_system?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
       username: test
-      password: 'xxxxxxx'
-      url: jdbc:mysql://xxxxxxx:3306/seckill_system
+      password: '@Song123456'
+      url: jdbc:mysql://1.116.208.200:3306/seckill_system
 mybatis-plus:
   type-aliases-package: com.jayce.seckillsystem.dao
   mapper-locations: classpath:/mappers/*.xml

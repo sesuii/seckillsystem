@@ -1,7 +1,7 @@
 package com.jayce.seckillsystem.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.google.common.util.concurrent.RateLimiter;
 import com.jayce.seckillsystem.constant.RedisConstant;
 import com.jayce.seckillsystem.constant.ResultEnum;
 import com.jayce.seckillsystem.entity.GoodsStore;
@@ -13,7 +13,7 @@ import com.jayce.seckillsystem.rabbitmq.SkMessageSender;
 import com.jayce.seckillsystem.service.IAccessRuleService;
 import com.jayce.seckillsystem.service.IGoodsService;
 import com.jayce.seckillsystem.service.ISkOrderService;
-import com.jayce.seckillsystem.util.WebUtil;
+import com.jayce.seckillsystem.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,6 +46,9 @@ public class SeckillController {
     private SkMessageSender skMessageSender;
 
     @Resource
+    private IUserService userService;
+
+    @Resource
     private DefaultRedisScript<Long> redisScript;
 
     @Resource
@@ -56,7 +57,7 @@ public class SeckillController {
     @Resource
     private IAccessRuleService accessRuleService;
 
-//    private RateLimiter rateLimiter = RateLimiter.create(200);
+//    private final RateLimiter rateLimiter = RateLimiter.create(200);
 
     /**
      * 库存预热
@@ -79,10 +80,9 @@ public class SeckillController {
     }
 
     @ApiOperation("生成秒杀随机地址")
-    @GetMapping(value = "/skPath")
-    public Result<?> getPath(User user, Long goodsId) {
-        if(user == null) return Result.failed(ResultEnum.AUTH_DENY);
-        String skPath = skOrderService.createPath(user, goodsId);
+    @GetMapping(value = "/create-skpath")
+    public Result<?> getPath(Long userId, Long goodsId) {
+        String skPath = skOrderService.createPath(userId, goodsId);
         return Result.success(skPath);
     }
 
@@ -93,88 +93,68 @@ public class SeckillController {
      */
     @ApiOperation("秒杀操作")
     @PostMapping("/{skPath}/sekillgoods")
-    public Result<?> seckillGoods(@PathVariable String skPath, @RequestBody User user, Long goodsId) {
+    public Result<?> seckillGoods(@PathVariable String skPath, Long userId, Long goodsId) {
 //        // 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
 //        // 这里用了 synchronize 锁，所以效率会有所降低
 //        if (!rateLimiter.tryAcquire(2, TimeUnit.SECONDS)) {
 //            log.info("被限流了！");
 //            return RestBean.failed(RestBeanEnum.FAILED);
 //        }
-
-        boolean isLegalPath = skOrderService.checkPath(user, goodsId, skPath);
-        if(!isLegalPath) return Result.failed(ResultEnum.FAILED);
+        User user = userService.getById(userId);
+        // 判断秒杀路径是否合法
+        boolean isLegalPath = skOrderService.checkPath(userId, goodsId, skPath);
+        if(!isLegalPath) return Result.failed(ResultEnum.FAILED, "秒杀路径错误");
         // 判断用户是否有抢购资格
         boolean hasAccessAuthority = accessRuleService.checkAccessAuthority(user, goodsId);
         if(!hasAccessAuthority) return Result.failed(ResultEnum.WITHOUT_ACCESS_AUTHORITY);
-        // 判断商品是否卖完了
+        // 判断商品是否卖完
         if (hasSoldOut(goodsId)) {
             log.info("{}号商品已经卖完", goodsId);
             return Result.failed(ResultEnum.GET_GOODS_IS_OVER);
         }
         // 判断用户是否重复秒杀某一商品
-        if (hasPurchased(user.getId(), goodsId)) {
-            log.info("{}号顾客不能重复秒杀商品", user.getId());
+        if (hasPurchased(userId, goodsId)) {
+            log.info("{}号顾客不能重复秒杀商品", userId);
             return Result.failed(ResultEnum.GET_GOODS_IS_REUSE);
         }
         // 判断商品是否还有库存
         if (!hasStock(goodsId)) {
-            // 标记商品已经卖完了
             log.info("{}号商品已经卖完", goodsId);
-            GoodsStore.goodsSoldOut.put(goodsId, true); // 内存标记
+            // 内存标记
+            GoodsStore.goodsSoldOut.put(goodsId, true);
             return Result.failed(ResultEnum.GET_GOODS_IS_OVER);
         }
         // 创建秒杀信息
+
         SkMessage skMessage = SkMessage.builder()
                 .skUser(user)
                 .goodsId(goodsId)
                 .build();
-
-//         将秒杀消息放入消息队列
+        // 将秒杀消息放入消息队列
         skMessageSender.send(JSON.toJSONString(skMessage));
-        return Result.success("秒杀成功");
+        return Result.success();
     }
 
     /**
     * @Description 获取秒杀结果
     *        
-    * @param user 秒杀用户
+    * @param userId 秒杀用户 ID
     * @param goodsId 商品id
-    * @return 订单号
+    * @return 订单 ID
     *
     **/
     @ApiOperation("获取秒杀结果")
     @GetMapping("getResult")
-    public Result<?> getResult(User user, Long goodsId) {
-        if (user == null) {
-            return Result.failed(ResultEnum.AUTH_DENY);
-        }
-        Long orderId = skOrderService.getResult(user, goodsId);
+    public Result<?> getResult(Long userId, Long goodsId) {
+        Long orderId = skOrderService.getResult(userId, goodsId);
         return Result.success(orderId);
     }
 
     /**
-     * 判断用户是否登录
-     *
-     * @return 返回 null 表示未登录
-     */
-    private User isLogin() {
-        HttpServletRequest request = WebUtil.getRequest();
-        Cookie[] cookies = request.getCookies();
-        if (ArrayUtils.isEmpty(cookies)) {
-            return null;
-        }
-        Optional<Object> skUserStr = Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals(RedisConstant.COOKIE_NAME))
-                .map(cookie -> redisTemplate.opsForValue().get(cookie.getValue()))
-                .findFirst();
-        return skUserStr.map(s -> JSON.parseObject(s.toString(), User.class)).orElse(null);
-    }
-
-    /**
-     * 判断商品是否卖完了
+     * 判断商品是否卖完
      *
      * @param goodsId 商品 id
-     * @return 返回 true 表示该商品卖完了
+     * @return 返回 true 表示该商品已卖完
      */
     private boolean hasSoldOut(long goodsId) {
         Boolean soldOut = GoodsStore.goodsSoldOut.get(goodsId);

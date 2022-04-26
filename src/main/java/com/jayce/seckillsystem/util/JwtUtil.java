@@ -1,10 +1,10 @@
 package com.jayce.seckillsystem.util;
 
+import com.jayce.seckillsystem.constant.RedisConstant;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,18 +13,17 @@ import java.util.UUID;
 public class JwtUtil {
 
     /**
-     * 生成jwt
-     * 使用Hs256算法, 私匙使用固定秘钥
+     * 生成 jwt
+     * 使用 Hs256 算法, 私匙使用固定秘钥 '123456'
      *
      * @param subject 加密信息
-//     * @param ttlMillis jwt过期时间(毫秒)
      * @return
      */
     public static String createJWT(String subject) {
-        // 生成JWT的时间
+        // 生成 JWT 的时间
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        Map<String, Object> claims = new HashMap<String, Object>();
+        Map<String, Object> claims = new HashMap<>();
         claims.put("token", subject);
 
         JwtBuilder builder = Jwts.builder()
@@ -32,22 +31,15 @@ public class JwtUtil {
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(now)
                 .setSubject(subject)
-                .setExpiration(new Date(nowMillis + 3600 * 30))
+                .setExpiration(new Date(nowMillis + RedisConstant.TOKEN_EXPIRE_TIME))
                 .signWith(SignatureAlgorithm.HS256, "123456");
-//        if (ttlMillis >= 0) {
-//            long expMillis = nowMillis + ttlMillis;
-//            Date exp = new Date(expMillis);
-//            // 设置过期时间
-//            builder.setExpiration(exp);
-//        }
         return builder.compact();
     }
-
 
     /**
      * Token的解密
      *
-     * @param token  加密后的token
+     * @param token 加密后的 token
      * @return
      */
     public static Claims parseJWT(String token) {

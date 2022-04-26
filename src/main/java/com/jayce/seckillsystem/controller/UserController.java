@@ -37,18 +37,10 @@ public class UserController {
     @Resource
     private IUserFinancialService userFinancialService;
 
-    /**
-    * @Description 获取用户信息
-    *
-    * @Param []
-    * @return
-    *
-    * @Author YoungSong
-    **/
+    @ApiOperation("获取用户信息")
     @GetMapping("/user-info")
     public Result<?> info() {
         SecurityContext context = SecurityContextHolder.getContext();
-        System.out.println("mo" + context.getAuthentication().getName());
         User user = userService.getOne(
                 new LambdaQueryWrapper<User>()
                         .eq(User::getMobilePhone, context.getAuthentication().getName())

@@ -30,10 +30,26 @@ public interface SkGoodsMapper extends BaseMapper<SkGoods> {
      *
      * @param skGoods 商品
      */
-//    @Update("update sk_goods set stock = stock - 1, version = version + 1 where id = #{id} and version = #{version}")
     @Update("update sk_goods set stock = stock - 1 where id = #{id} and stock > 0")
     int reduceStock(SkGoods skGoods);
 
+    /**
+    * @Description 获取秒杀商品
+    *
+    * @param goodsId 商品 ID
+    * @return 秒杀商品
+    *
+    **/
     @Select("select * from sk_goods where goods_id = #{goodsId}")
     SkGoods getByGoodsId(@Param("goodsId") Long goodsId);
+
+    /**
+    * @Description 回滚库存
+    *
+    * @param skGoods 秒杀商品
+    * @return
+    *
+    **/
+    @Update("update sk_goods set stock = stock + 1 where id = #{id}")
+    int rollbackStock(SkGoods skGoods);
 }

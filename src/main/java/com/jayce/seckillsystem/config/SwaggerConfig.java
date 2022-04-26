@@ -15,13 +15,13 @@ public class SwaggerConfig {
     @Bean
     public Docket docket() {
         ApiInfo info = new ApiInfoBuilder()
-                .contact(new Contact("Song", "https://www.google.com", "2316020516@qq.com"))
+                .contact(new Contact("Song", "https://www.google.com", "songjiah27@gmail.com"))
                 .title("秒杀系统 - 在线API接口文档")
                 .description("秒杀系统的后端API文档，欢迎前端人员查阅！")
                 .build();
         return new Docket(DocumentationType.OAS_30)
                 .apiInfo(info)
-                .select()       //对项目中的所有API接口进行选择
+                .select()
                 .apis(RequestHandlerSelectors.basePackage("com.jayce.seckillsystem.controller"))
                 .build();
     }

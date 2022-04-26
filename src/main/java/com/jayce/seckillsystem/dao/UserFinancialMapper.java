@@ -17,6 +17,14 @@ import java.math.BigDecimal;
  */
 public interface UserFinancialMapper extends BaseMapper<UserFinancial> {
 
+    /**
+    * @Description 减少用户账户金额
+    *
+    * @param id 用户 ID
+    * @param pay 用户需支付的金额
+    * @return
+    *
+    **/
     @Update("update user_financial set balance = balance - #{pay} where id = #{id} and balance - #{pay} >= 0")
     int reduce(@Param("id") Long id, @Param("pay") BigDecimal pay);
 }
