@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.Map;
 
+/**
+ * 用户认证
+ *
+ * @author gerry
+ */
 @Api(tags = "用户认证接口", value = "包括用户登录、注册操作")
 @RestController
 @RequestMapping("/api/auth")
@@ -27,7 +32,9 @@ public class AuthController {
                               String mobilePhone,
                               String password) {
         User user = userService.createAccount(username, identityId, mobilePhone, password);
-        if(user == null) return Result.failed(ResultEnum.SAVE_USER_REUSE);
+        if(user == null) {
+            return Result.failed(ResultEnum.SAVE_USER_REUSE);
+        }
         return  Result.success(user);
     }
 

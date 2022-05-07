@@ -42,18 +42,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     AuthenticationManager authenticationManager;
 
-    /**
-     * @return
-     * @Description 创建用户 用户注册
-     * @Param [username, identityId, mobilePhone, password]
-     * @Author Gerry
-     **/
     @Override
     public User createAccount(String username, String identityId, String mobilePhone, String password) {
         User user = getOne(new LambdaQueryWrapper<User>()
                 .eq(User::getMobilePhone, mobilePhone)
         );
-        if (user != null) return null;
+        if (user != null) {
+            return null;
+        }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         user = User.builder()
                 .realname(username)
@@ -67,13 +63,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return user;
     }
 
-    /**
-    * @Description 用户登录，成功返回 Token
-    *
-    * @param user 用户
-    * @return
-    *
-    **/
     @Override
     public Map<String, String> toLogin(User user) {
         UsernamePasswordAuthenticationToken authenticationToken =

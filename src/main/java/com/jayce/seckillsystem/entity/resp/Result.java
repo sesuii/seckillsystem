@@ -5,6 +5,9 @@ import com.jayce.seckillsystem.constant.ResultEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * @author gerry
+ */
 @Data
 @AllArgsConstructor
 public class Result<T> {

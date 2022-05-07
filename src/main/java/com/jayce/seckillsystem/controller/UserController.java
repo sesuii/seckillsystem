@@ -13,10 +13,12 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.websocket.server.PathParam;
 
 /**
  * <p>
@@ -49,8 +51,8 @@ public class UserController {
     }
 
     @ApiOperation("用户账户信息接口")
-    @GetMapping("/{userId}account")
-    public Result<?> getUserAccount(@PathParam("userId") Long userId) {
+    @GetMapping("/account{userId}")
+    public Result<?> getUserAccount(@PathVariable Long userId) {
         UserFinancial userFinancial = userFinancialService.getById(userId);
         return Result.success(userFinancial);
     }

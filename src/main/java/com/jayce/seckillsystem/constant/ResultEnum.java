@@ -38,10 +38,10 @@ public enum ResultEnum {
     // 生成订单时状态码及信息
     ADD_ORDER_ERROR(5201, "生成订单失败"),
     ORDER_NOT_EXIST(5202, "订单不存在"),
-    GET_ORDER_ERROR(5203, "查询订单失败"),
+    ORDER_ERROR(5203, "订单异常"),
     ORDER_NOT_PAY(5204, "订单仍未支付"),
     ORDER_HAS_CANCEL(5205, "订单已取消"),
-    ;
+    ORDER_HAS_PAID(5206, "订单已支付");
 
     private int code;
     private String message;

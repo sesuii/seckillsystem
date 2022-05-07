@@ -32,15 +32,9 @@ public class AccessRuleServiceImpl extends ServiceImpl<AccessRuleMapper, AccessR
     @Resource
     private IUserFinancialService userFinancialService;
 
+    public final static int WITHOUT_LIMIT = -1;
+    public final static int UNEMPLOYMENT = 0;
 
-    /**
-    * @Description 判断用户是否有购买产品的资格
-    *        根据准入规则的年龄，逾期次数和逾期金额限制
-    * @param user 用户
-    * @param goodsId 产品ID
-    * @return
-    *
-    **/
     @Override
     public boolean checkAccessAuthority(User user, Long goodsId) {
         GoodsVo goodsVo = goodsService.findGoodsVoById(goodsId);
@@ -48,25 +42,30 @@ public class AccessRuleServiceImpl extends ServiceImpl<AccessRuleMapper, AccessR
         UserFinancial userFinancial = userFinancialService.getById(user.getId());
         if(limitedId != 0L) {
             AccessRule accessRule = accessRuleService.getById(limitedId);
-            if(userFinancial.getIntegrityDegree() < 0) return false;
-            // 用户无工作
-            if(accessRule.getWorkstatusLimit() == 0) return false;
-            if(!accessRule.getOverTotalAmount().equals(-1) ||
-                    userFinancial.getOverAmount().compareTo(accessRule.getOverTotalAmount()) > 0)
+            if(userFinancial.getIntegrityDegree() < 0) {
                 return false;
-            return accessRule.getAgeLimit() == -1 &&
+            }
+            // 用户无工作
+            if(accessRule.getWorkstatusLimit() == UNEMPLOYMENT) {
+                return false;
+            }
+            if(!accessRule.getOverTotalAmount().equals(WITHOUT_LIMIT) ||
+                    userFinancial.getOverAmount().compareTo(accessRule.getOverTotalAmount()) > 0) {
+                return false;
+            }
+            return accessRule.getAgeLimit() == WITHOUT_LIMIT &&
                     getUserAge(user.getIdentityId()) >= accessRule.getAgeLimit();
         }
         return true;
     }
 
     /**
-    * @Description 从身份证中获取用户年龄
-    *
-    * @param identityId 身份证号
-    * @return
-    *
-    **/
+     * 从身份证获取用户年龄
+     *
+     * @param identityId 身份证号码
+     * @return 用户年龄
+     *
+     **/
     private int getUserAge(String identityId) {
         String birthday = identityId.substring(6, 14);
         Calendar curCalendar = Calendar.getInstance();
@@ -80,7 +79,8 @@ public class AccessRuleServiceImpl extends ServiceImpl<AccessRuleMapper, AccessR
         int birthDay = Integer.parseInt(birthday.substring(6));
 
         int userAge = curYear - birthYear;
-        if(curMonth - birthMonth > 0 || (curMonth == birthMonth && curDay - birthDay > 0)) {
+        if(curMonth - birthMonth > 0 ||
+                (curMonth == birthMonth && curDay - birthDay > 0)) {
             return userAge;
         }
         return userAge - 1;

@@ -32,7 +32,7 @@ public class SkGoodsController {
     IGoodsService goodsService;
 
     @ApiOperation("获取商品列表")
-    @GetMapping("")
+    @GetMapping("/get-list")
     public Result<?> skGoodsCategory() {
         List<GoodsVo> goodsList = goodsService.getGoodsList();
         return Result.success(goodsList);

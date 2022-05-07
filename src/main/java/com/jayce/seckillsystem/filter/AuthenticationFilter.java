@@ -53,10 +53,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         String mobilePhone = claims.getSubject();
         String s = (String) redisTemplate.opsForValue().get(RedisConstant.USER_NAME_PREFIX + mobilePhone);
         UserVo userVo = JSON.parseObject(s, UserVo.class);
-        if(userVo == null) try {
-            throw new Exception("用户未登录");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(userVo == null) {
+            try {
+                throw new Exception("用户未登录");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userVo, null, null);

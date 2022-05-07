@@ -17,7 +17,7 @@ public class RabbitmqConstant {
     public static final String SECKILL_QUEUE = "seckill_queue";
 
     /**
-     * 秒杀队列 routingkey
+     * 秒杀队列 routing key
      */
     public static final String TOPIC_ROUTING_KEY_SECKILL = "topic.seckill";
 
@@ -42,7 +42,7 @@ public class RabbitmqConstant {
     public static final String DLX_QUEUE = "order_dlx_queue";
 
     /**
-     * 延迟队列 routingkey
+     * 延迟队列 routing key
      */
     public static final String TOPIC_ROUTING_KEY_PAYMENT = "dlx.payment";
 

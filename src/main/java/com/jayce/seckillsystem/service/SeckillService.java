@@ -11,6 +11,7 @@ public interface SeckillService {
      *
      * @param userId  用户ID
      * @param goodsId 商品ID
+     * @return true 秒杀成功
      */
     boolean seckill(Long userId, Long goodsId) throws Exception;
 }

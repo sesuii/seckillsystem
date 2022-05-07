@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * @author gerry
+ */
 public class JwtUtil {
 
     /**
@@ -17,15 +20,14 @@ public class JwtUtil {
      * 使用 Hs256 算法, 私匙使用固定秘钥 '123456'
      *
      * @param subject 加密信息
-     * @return
+     * @return Token
      */
     public static String createJWT(String subject) {
         // 生成 JWT 的时间
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        Map<String, Object> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>(16);
         claims.put("token", subject);
-
         JwtBuilder builder = Jwts.builder()
                 .setClaims(claims)
                 .setId(UUID.randomUUID().toString())

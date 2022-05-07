@@ -16,7 +16,20 @@ import java.util.List;
  */
 public interface IGoodsService extends IService<Goods> {
 
+    /**
+     * 获取商品列表
+     *
+     * @return
+     *
+     **/
     List<GoodsVo> getGoodsList();
 
+    /**
+     * 通过商品ID获取商品信息
+     *
+     * @param goodsId 商品ID
+     * @return
+     *
+     **/
     GoodsVo findGoodsVoById(Long goodsId);
 }

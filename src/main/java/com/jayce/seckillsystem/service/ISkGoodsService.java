@@ -10,11 +10,39 @@ import com.jayce.seckillsystem.entity.SkGoods;
  */
 public interface ISkGoodsService extends IService<SkGoods> {
 
+    /**
+     * 获取商品库存
+     *
+     * @param goodsId 商品ID
+     * @return
+     *
+     **/
     int getStock(Long goodsId);
 
+    /**
+     * 减少商品库存
+     *
+     * @param skGoods 秒杀商品
+     * @return
+     *
+     **/
     int reduceStock(SkGoods skGoods);
 
+    /**
+     * 通过商品ID获取商品信息
+     *
+     * @param goodsId 商品ID
+     * @return
+     *
+     **/
     SkGoods getByGoodsId(Long goodsId);
 
+    /**
+     * 回滚商品库存
+     *
+     * @param skGoods 秒杀商品
+     * @return
+     *
+     **/
     int rollbackStock(SkGoods skGoods);
 }

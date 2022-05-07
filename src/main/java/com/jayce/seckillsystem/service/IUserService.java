@@ -16,7 +16,24 @@ import java.util.Map;
  */
 public interface IUserService extends IService<User> {
 
+    /**
+     * 创建新的用户
+     *
+     * @param username 用户姓名
+     * @param identityId 用户身份证
+     * @param mobilePhone 用户手机号
+     * @param password 用户密码
+     * @return 用户信息
+     *
+     **/
     User createAccount(String username, String identityId, String mobilePhone, String password);
 
+    /**
+     * 用户登录
+     *
+     * @param user 用户信息
+     * @return
+     *
+     **/
     Map<String, String> toLogin(User user);
 }

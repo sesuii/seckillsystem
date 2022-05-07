@@ -94,25 +94,29 @@ public class SeckillController {
     @ApiOperation("秒杀操作")
     @PostMapping("/{skPath}/sekillgoods")
     public Result<?> seckillGoods(@PathVariable String skPath, Long userId, Long goodsId) {
-//        // 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
-//        // 这里用了 synchronize 锁，所以效率会有所降低
-//        if (!rateLimiter.tryAcquire(2, TimeUnit.SECONDS)) {
-//            log.info("被限流了！");
-//            return RestBean.failed(RestBeanEnum.FAILED);
-//        }
+        /// 兜底方案之 - 令牌桶限流，两秒内需获取到令牌，否则请求被抛弃
+        // 这里用了 synchronize 锁，所以效率会有所降低，暂时不开启
+        // if (!rateLimiter.tryAcquire(2, TimeUnit.SECONDS)) {
+        //    log.info("被限流了！");
+        //    return RestBean.failed(RestBeanEnum.FAILED);
+        // }
         User user = userService.getById(userId);
         // 判断秒杀路径是否合法
         boolean isLegalPath = skOrderService.checkPath(userId, goodsId, skPath);
-        if(!isLegalPath) return Result.failed(ResultEnum.FAILED, "秒杀路径错误");
+        if(!isLegalPath) {
+            return Result.failed(ResultEnum.FAILED, "秒杀路径错误");
+        }
         // 判断用户是否有抢购资格
         boolean hasAccessAuthority = accessRuleService.checkAccessAuthority(user, goodsId);
-        if(!hasAccessAuthority) return Result.failed(ResultEnum.WITHOUT_ACCESS_AUTHORITY);
+        if(!hasAccessAuthority) {
+            return Result.failed(ResultEnum.WITHOUT_ACCESS_AUTHORITY);
+        }
         // 判断商品是否卖完
         if (hasSoldOut(goodsId)) {
             log.info("{}号商品已经卖完", goodsId);
             return Result.failed(ResultEnum.GET_GOODS_IS_OVER);
         }
-        // 判断用户是否重复秒杀某一商品
+        // 判断用户是否重复秒杀同一商品
         if (hasPurchased(userId, goodsId)) {
             log.info("{}号顾客不能重复秒杀商品", userId);
             return Result.failed(ResultEnum.GET_GOODS_IS_REUSE);
@@ -125,7 +129,6 @@ public class SeckillController {
             return Result.failed(ResultEnum.GET_GOODS_IS_OVER);
         }
         // 创建秒杀信息
-
         SkMessage skMessage = SkMessage.builder()
                 .skUser(user)
                 .goodsId(goodsId)
@@ -136,7 +139,7 @@ public class SeckillController {
     }
 
     /**
-    * @Description 获取秒杀结果
+    * 获取秒杀结果
     *        
     * @param userId 秒杀用户 ID
     * @param goodsId 商品id
@@ -144,7 +147,7 @@ public class SeckillController {
     *
     **/
     @ApiOperation("获取秒杀结果")
-    @GetMapping("getResult")
+    @GetMapping("/getResult")
     public Result<?> getResult(Long userId, Long goodsId) {
         Long orderId = skOrderService.getResult(userId, goodsId);
         return Result.success(orderId);

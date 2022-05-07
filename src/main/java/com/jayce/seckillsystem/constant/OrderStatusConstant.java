@@ -9,16 +9,17 @@ package com.jayce.seckillsystem.constant;
  **/
 public class OrderStatusConstant {
 
-    /*
+    /**
      * 订单新建未支付
      **/
     public static final int ORDER_JUST_CREATE = 0;
-    /*
+
+    /**
     * 订单已支付
     **/
     public static final int ORDER_HAS_PAID = 1;
 
-    /*
+    /**
      * 订单已取消
      **/
     public static final int ORDER_HAS_CANCELED = 2;
