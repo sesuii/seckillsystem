@@ -90,12 +90,7 @@ public class SkOrderController {
         if(!checkOrder(order)) {
             return Result.failed(ResultEnum.ORDER_ERROR);
         }
-        boolean isPaidSuccess;
-        try {
-            isPaidSuccess = orderInfoService.payOrder(order);
-        } catch (Throwable e) {
-            return Result.failed(ResultEnum.FAILED);
-        }
+        boolean isPaidSuccess = orderInfoService.payOrder(order);
         if(isPaidSuccess) {
             return Result.success();
         }

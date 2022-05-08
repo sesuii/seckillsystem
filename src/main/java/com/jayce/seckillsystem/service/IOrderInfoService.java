@@ -30,7 +30,7 @@ public interface IOrderInfoService extends IService<OrderInfo> {
      * @param order 订单
      * @return
      **/
-    boolean payOrder(OrderInfo order) throws Exception;
+    boolean payOrder(OrderInfo order);
 
     /**
      * 取消订单 删除秒杀订单内容 将订单状态设为 取消状态
