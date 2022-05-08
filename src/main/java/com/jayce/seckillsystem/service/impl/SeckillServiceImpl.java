@@ -2,6 +2,7 @@ package com.jayce.seckillsystem.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.jayce.seckillsystem.constant.OrderStatusConstant;
 import com.jayce.seckillsystem.constant.RedisConstant;
 import com.jayce.seckillsystem.entity.Goods;
 import com.jayce.seckillsystem.entity.OrderInfo;
@@ -114,25 +115,20 @@ public class SeckillServiceImpl implements SeckillService {
         OrderInfo order =OrderInfo.builder()
                 .goodsId(goodsId)
                 .userId(userId)
-                .status((byte) 0)
+                .status((byte) OrderStatusConstant.ORDER_JUST_CREATE)
                 .createTime(new Date())
                 .goodsPrice(goods.getGoodsPrice())
                 .goodsCount(1)
                 .goodsName(goods.getGoodsName())
                 .build();
         isSaveOrderInfo = orderInfoService.save(order);
-        System.out.println(order.getId());
         // 创建秒杀订单
         SkOrder skOrder = SkOrder.builder()
                 .orderInfoId(order.getId())
                 .userId(userId)
                 .goodsId(goodsId)
                 .build();
-        try {
-            isSaveSkOrder = skOrderService.save(skOrder);
-        } catch (Exception e) {
-            throw e;
-        }
+        isSaveSkOrder = skOrderService.save(skOrder);
         // 发送消息到 TTL 队列
         orderInfoSender.send(JSON.toJSONString(order));
         return isSaveSkOrder && isSaveOrderInfo;

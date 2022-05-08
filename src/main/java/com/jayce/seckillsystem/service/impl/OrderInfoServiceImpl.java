@@ -5,13 +5,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jayce.seckillsystem.constant.OrderStatusConstant;
 import com.jayce.seckillsystem.constant.RedisConstant;
 import com.jayce.seckillsystem.dao.OrderInfoMapper;
+import com.jayce.seckillsystem.dao.UserFinancialMapper;
 import com.jayce.seckillsystem.entity.*;
 import com.jayce.seckillsystem.entity.vo.GoodsVo;
 import com.jayce.seckillsystem.entity.vo.OrderInfoVo;
 import com.jayce.seckillsystem.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -55,6 +61,9 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+
+
     /**
     * 获取订单详情信息
     *
@@ -74,6 +83,13 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
                 .build();
     }
 
+
+    @Resource
+    DataSourceTransactionManager dateSourceTransactionManager;
+
+    @Resource
+    TransactionDefinition transactionDefinition;
+
     /**
      * 支付订单
      *
@@ -82,46 +98,15 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
      *
      **/
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public boolean payOrder(OrderInfo order) throws Exception {
-
-        // 更新个人账户
-        UserFinancial userFinancial = userFinancialService.getById(order.getUserId());
-        if(userFinancial == null) {
+    public boolean payOrder(OrderInfo order) {
+        TransactionStatus status = dateSourceTransactionManager.getTransaction(transactionDefinition);
+        boolean paySuccess = doPayOrder(order);
+        if(!paySuccess) {
+            dateSourceTransactionManager.commit(status);
+        }
+        else {
+            dateSourceTransactionManager.rollback(status);
             return false;
-        }
-        boolean isUpdateUser = userFinancialService.reduce(userFinancial, order.getGoodsPrice());
-        if(!isUpdateUser) {
-            return false;
-        }
-        // 更新银行账户
-        BankAccount bankAccount = bankAccountService.getById(1L);
-        bankAccount.setAccountBalance(bankAccount.getAccountBalance().add(order.getGoodsPrice()));
-        boolean isUpdateBank = bankAccountService.updateById(bankAccount);
-        if(!isUpdateBank) {
-            log.info("转账失败");
-            throw new Exception("转账失败");
-        }
-        // 更新订单状态
-        order.setStatus((byte) OrderStatusConstant.ORDER_HAS_PAID);
-        order.setPayTime(new Date());
-        boolean isUpdateOrder = orderInfoService.updateById(order);
-        if(!isUpdateOrder) {
-            log.info("订单异常");
-            throw new Exception("订单异常");
-        }
-        // 创建交易记录
-        TradeRecord tradeRecord = TradeRecord.builder()
-                .orderId(order.getId())
-                .payeeId(bankAccount.getId())
-                .remitterId(order.getUserId())
-                .tradingTime(order.getPayTime())
-                .build();
-
-        boolean isCreateRecord = tradeRecordService.save(tradeRecord);
-        if(!isCreateRecord) {
-            log.info("订单异常");
-            throw new Exception("订单异常");
         }
         return true;
     }
@@ -198,14 +183,54 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     }
 
     /**
-    * 订单是否已经取消
-    *
-    * @param order 订单
-    * @return true 已取消
-    *
-    **/
-    private boolean isOrderCanceled(OrderInfo order) {
-        return order.getStatus() == OrderStatusConstant.ORDER_HAS_CANCELED;
+     * 支付操作-数据库数据修改
+     *
+     * @param order 订单
+     * @return
+     *
+     **/
+    private boolean doPayOrder(OrderInfo order) {
+        UserFinancial userFinancial = userFinancialService.getById(order.getUserId());
+        if(userFinancial == null) {
+            return false;
+        }
+        try {
+            // 更新银行账户
+            BankAccount bankAccount = bankAccountService.getById(1L);
+            bankAccount.setAccountBalance(bankAccount.getAccountBalance().add(order.getGoodsPrice()));
+            boolean updateBankAccount = bankAccountService.updateById(bankAccount);
+            if(!updateBankAccount) {
+                return false;
+            }
+            // 更新订单状态
+            order.setStatus((byte) OrderStatusConstant.ORDER_HAS_PAID);
+            order.setPayTime(new Date());
+            boolean updateOrderStatus = orderInfoService.updateById(order);
+            if(!updateOrderStatus) {
+                return false;
+            }
+            // 创建交易记录
+            TradeRecord tradeRecord = TradeRecord.builder()
+                    .orderId(order.getId())
+                    .payeeId(bankAccount.getId())
+                    .remitterId(order.getUserId())
+                    .tradingTime(order.getPayTime())
+                    .build();
+            boolean saveRecord = tradeRecordService.save(tradeRecord);
+            if(!saveRecord) {
+                return false;
+            }
+            // 更新个人账户
+            boolean updateUserFinancial = userFinancialService.reduce(userFinancial, order.getGoodsPrice());
+            if(!updateUserFinancial) {
+                return false;
+            }
+        }
+        catch (Exception e) {
+            log.info("数据库执行异常");
+            return false;
+        }
+        return true;
     }
 
 }
